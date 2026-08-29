@@ -149,8 +149,8 @@ export default function AdminPanel() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const catData = {
-      id: formData.get('id'),
-      title: formData.get('title'),
+      id: (formData.get('id') || '').trim(),
+      title: (formData.get('title') || '').trim(),
       desc: formData.get('desc'),
       bannerImg: editingData?.bannerImg || ''
     };
@@ -204,15 +204,15 @@ export default function AdminPanel() {
     const formData = new FormData(e.target);
     
     const projData = {
-      title: formData.get('title'),
-      subtitle: formData.get('subtitle'),
+      title: (formData.get('title') || '').trim(),
+      subtitle: (formData.get('subtitle') || '').trim(),
       desc: formData.get('desc'),
-      category: formData.get('category'),
-      space: formData.get('space'),
-      duration: formData.get('duration'),
-      year: formData.get('year'),
-      location: formData.get('location'),
-      materials: formData.get('materials'),
+      category: (formData.get('category') || '').trim(),
+      space: (formData.get('space') || '').trim(),
+      duration: (formData.get('duration') || '').trim(),
+      year: (formData.get('year') || '').trim(),
+      location: (formData.get('location') || '').trim(),
+      materials: (formData.get('materials') || '').trim(),
       defaultImg: editingData?.defaultImg || '',
       gallery: editingData?.gallery || []
     };

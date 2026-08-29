@@ -13,8 +13,9 @@ export default function CategoryPage() {
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const categoryObj = categories.find(c => c.id === id) || {};
-  const categoryTitle = categoryObj.title || '';
+  const decodedId = id ? decodeURIComponent(id).trim() : '';
+  const categoryObj = categories.find(c => (c.id || '').trim() === decodedId) || {};
+  const categoryTitle = (categoryObj.title || '').trim();
   const categoryDesc = categoryObj.desc || '';
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function CategoryPage() {
     }
   };
 
-  const categoryProjects = projects.filter(p => p.category === categoryTitle);
+  const categoryProjects = projects.filter(p => (p.category || '').trim() === categoryTitle);
   const randomProj = categoryProjects[Math.floor(Math.random() * categoryProjects.length)] || {};
   const bannerImg = categoryObj.bannerImg
     || randomProj.customImg
