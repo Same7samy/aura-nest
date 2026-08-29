@@ -840,7 +840,7 @@ export default function AdminPanel() {
               {subView === 'edit-category' ? 'تعديل الفئة الهندسية' : 'إضافة فئة هندسية جديدة'}
             </h3>
 
-            <form onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '600px' }}>
+            <form key={editingData?.id || 'new-category'} onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '600px' }}>
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>معرّف الفئة (ID) بالإنجليزية (يُستخدم للرابط الإلكتروني)*</label>
                 <input 
@@ -953,7 +953,7 @@ export default function AdminPanel() {
               {subView === 'edit-project' ? 'تعديل تفاصيل المشروع' : 'إضافة مشروع جديد للمعرض'}
             </h3>
 
-            <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <form key={editingData?.id || 'new-project'} onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
               <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
                 <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>عنوان المشروع الأساسي*</label>
                 <input 
@@ -984,7 +984,11 @@ export default function AdminPanel() {
                 <select 
                   name="category" 
                   className="form-control" 
-                  defaultValue={editingData?.category || ''}
+                  value={editingData?.category || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditingData(prev => ({ ...prev, category: val }));
+                  }}
                   style={{ fontFamily: 'var(--font-arabic)' }}
                   required
                 >
