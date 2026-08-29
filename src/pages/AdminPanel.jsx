@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Lock, Settings, Plus, Edit2, Trash2, Save, X, 
-  Layers, Briefcase, PhoneCall, Image, Upload, AlertCircle, CheckCircle 
+  Lock, Plus, Edit2, Trash2, Save, ArrowRight,
+  Layers, Briefcase, PhoneCall, Upload, AlertCircle, CheckCircle, X
 } from 'lucide-react';
 import { 
   getProjects, fetchProjectsFromSupabase, addProject, updateProject, deleteProject,
@@ -18,15 +18,15 @@ export default function AdminPanel() {
   // Tab control: 'categories', 'projects', 'contact'
   const [activeTab, setActiveTab] = useState('projects');
   
+  // View control: 'list', 'add-project', 'edit-project', 'add-category', 'edit-category'
+  const [subView, setSubView] = useState('list');
+  const [editingData, setEditingData] = useState(null);
+  
   // Loaded collections state
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
   const [contactData, setContactData] = useState({});
   const [loading, setLoading] = useState(false);
-  
-  // Modal controllers
-  const [categoryModal, setCategoryModal] = useState({ open: false, isEdit: false, data: null });
-  const [projectModal, setProjectModal] = useState({ open: false, isEdit: false, data: null });
   
   // Success alerts
   const [alert, setAlert] = useState({ show: false, message: '', type: 'success' });
@@ -124,7 +124,7 @@ export default function AdminPanel() {
       id: formData.get('id'),
       title: formData.get('title'),
       desc: formData.get('desc'),
-      bannerImg: categoryModal.data?.bannerImg || ''
+      bannerImg: editingData?.bannerImg || ''
     };
 
     if (!catData.id || !catData.title) {
@@ -133,12 +133,11 @@ export default function AdminPanel() {
     }
 
     setLoading(true);
-    if (categoryModal.isEdit) {
+    if (subView === 'edit-category') {
       const updated = await updateCategory(catData);
       setCategories(updated);
       showAlert('تم تعديل الفئة بنجاح');
     } else {
-      // Check for duplicate ID
       if (categories.some(c => c.id === catData.id)) {
         showAlert('معرّف الفئة (ID) موجود بالفعل، يرجى استخدام معرّف فريد', 'error');
         setLoading(false);
@@ -149,7 +148,8 @@ export default function AdminPanel() {
       showAlert('تم إضافة الفئة بنجاح');
     }
     setLoading(false);
-    setCategoryModal({ open: false, isEdit: false, data: null });
+    setEditingData(null);
+    setSubView('list');
   };
 
   const handleDeleteCategory = async (id) => {
@@ -167,7 +167,6 @@ export default function AdminPanel() {
     e.preventDefault();
     const formData = new FormData(e.target);
     
-    // Parse specs/materials from form
     const projData = {
       title: formData.get('title'),
       subtitle: formData.get('subtitle'),
@@ -178,12 +177,12 @@ export default function AdminPanel() {
       year: formData.get('year'),
       location: formData.get('location'),
       materials: formData.get('materials'),
-      defaultImg: projectModal.data?.defaultImg || '',
-      gallery: projectModal.data?.gallery || []
+      defaultImg: editingData?.defaultImg || '',
+      gallery: editingData?.gallery || []
     };
 
-    if (projectModal.isEdit && projectModal.data) {
-      projData.id = projectModal.data.id;
+    if (subView === 'edit-project' && editingData) {
+      projData.id = editingData.id;
     }
 
     if (!projData.title || !projData.category) {
@@ -192,7 +191,7 @@ export default function AdminPanel() {
     }
 
     setLoading(true);
-    if (projectModal.isEdit) {
+    if (subView === 'edit-project') {
       const updated = await updateProject(projData);
       setProjects(updated);
       showAlert('تم تعديل المشروع بنجاح');
@@ -202,7 +201,8 @@ export default function AdminPanel() {
       showAlert('تم إضافة المشروع بنجاح');
     }
     setLoading(false);
-    setProjectModal({ open: false, isEdit: false, data: null });
+    setEditingData(null);
+    setSubView('list');
   };
 
   const handleDeleteProject = async (id) => {
@@ -312,342 +312,346 @@ export default function AdminPanel() {
       </AnimatePresence>
 
       <div className="container">
-        {/* Header Block */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--primary-gold)', fontWeight: 700, display: 'block' }}>الإدارة العامة للمحتوى</span>
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0 }}>لوحة الإدارة والتحكم</h1>
-          </div>
+        {/* Compact Header Block */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0 }}>لوحة التحكم AURA NEST</h1>
           
-          {/* Quick Stats or Status */}
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-gray)' }}>
-              حالة الخادم: <span style={{ color: '#2ecc71', fontWeight: 700 }}>متصل سحابياً (Live)</span>
-            </span>
-          </div>
-        </div>
+          {/* Tab Navigation directly in the header */}
+          {subView === 'list' && (
+            <div style={{ display: 'flex', gap: '0.5rem', direction: 'rtl', flexWrap: 'wrap' }}>
+              <button 
+                onClick={() => setActiveTab('projects')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: activeTab === 'projects' ? 'var(--primary-gold)' : 'none',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: activeTab === 'projects' ? 'var(--white)' : 'var(--text-gray)',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.25s'
+                }}
+              >
+                <Briefcase size={15} />
+                <span>المشاريع ({projects.length})</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab('categories')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: activeTab === 'categories' ? 'var(--primary-gold)' : 'none',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: activeTab === 'categories' ? 'var(--white)' : 'var(--text-gray)',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.25s'
+                }}
+              >
+                <Layers size={15} />
+                <span>الفئات ({categories.length})</span>
+              </button>
 
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid var(--light-beige)', paddingBottom: '1px', direction: 'rtl' }}>
-          <button 
-            onClick={() => setActiveTab('projects')}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'projects' ? '3px solid var(--primary-gold)' : '3px solid transparent',
-              color: activeTab === 'projects' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
-              fontWeight: 700,
-              fontSize: '1.05rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.25s'
-            }}
-          >
-            <Briefcase size={18} />
-            <span>المشاريع ({projects.length})</span>
-          </button>
-          
-          <button 
-            onClick={() => setActiveTab('categories')}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'categories' ? '3px solid var(--primary-gold)' : '3px solid transparent',
-              color: activeTab === 'categories' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
-              fontWeight: 700,
-              fontSize: '1.05rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.25s'
-            }}
-          >
-            <Layers size={18} />
-            <span>الفئات الرئيسية ({categories.length})</span>
-          </button>
+              <button 
+                onClick={() => setActiveTab('contact')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: activeTab === 'contact' ? 'var(--primary-gold)' : 'none',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: activeTab === 'contact' ? 'var(--white)' : 'var(--text-gray)',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.25s'
+                }}
+              >
+                <PhoneCall size={15} />
+                <span>بيانات الاتصال</span>
+              </button>
+            </div>
+          )}
 
-          <button 
-            onClick={() => setActiveTab('contact')}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'contact' ? '3px solid var(--primary-gold)' : '3px solid transparent',
-              color: activeTab === 'contact' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
-              fontWeight: 700,
-              fontSize: '1.05rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.25s'
-            }}
-          >
-            <PhoneCall size={18} />
-            <span>بيانات التواصل</span>
-          </button>
+          {subView !== 'list' && (
+            <button 
+              onClick={() => {
+                setSubView('list');
+                setEditingData(null);
+              }}
+              className="btn"
+              style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', gap: '0.35rem', fontFamily: 'var(--font-arabic)' }}
+            >
+              <ArrowRight size={14} />
+              <span>الرجوع للقائمة</span>
+            </button>
+          )}
         </div>
 
         {/* Tab Contents */}
-        {loading && (
+        {loading && subView === 'list' && (
           <div style={{ textAlign: 'center', padding: '4rem 0' }}>
             <div style={{ width: '40px', height: '40px', border: '3px solid var(--light-beige)', borderTopColor: 'var(--primary-gold)', borderRadius: '50%', margin: '0 auto 1rem auto', animation: 'spin 1s infinite linear' }} />
             <p style={{ color: 'var(--text-gray)' }}>يرجى الانتظار... يتم تحميل وتحديث البيانات</p>
           </div>
         )}
 
-        {!loading && activeTab === 'categories' && (
-          <div style={{ direction: 'rtl' }}>
-            {/* Top Bar inside Tab */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.3rem', color: 'var(--dark-charcoal)', fontWeight: 800 }}>إدارة الفئات الهندسية</h3>
-              <button 
-                onClick={() => setCategoryModal({ open: true, isEdit: false, data: null })}
-                className="btn btn-primary" 
-                style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}
-              >
-                <Plus size={16} style={{ marginLeft: '0.5rem' }} />
-                <span>إضافة فئة جديدة</span>
-              </button>
-            </div>
-
-            {/* Categories Table/List */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-              {categories.map(cat => (
-                <div key={cat.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'right' }}>
-                  {cat.bannerImg && (
-                    <div style={{ height: '120px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
-                      <img src={cat.bannerImg} alt={cat.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  )}
-                  <div>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--dark-charcoal)', margin: 0 }}>{cat.title}</h4>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 600 }}>معرّف المسار: /{cat.id}</span>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: '0.5rem 0 0 0' }}>{cat.desc}</p>
-                  </div>
-                  
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
-                    <button 
-                      onClick={() => setCategoryModal({ open: true, isEdit: true, data: cat })}
-                      className="btn" 
-                      style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center' }}
-                    >
-                      <Edit2 size={14} style={{ marginLeft: '0.25rem' }} />
-                      <span>تعديل</span>
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteCategory(cat.id)}
-                      className="btn" 
-                      style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6' }}
-                    >
-                      <Trash2 size={14} style={{ marginLeft: '0.25rem' }} />
-                      <span>حذف</span>
-                    </button>
-                  </div>
+        {/* LIST SUBVIEW */}
+        {!loading && subView === 'list' && (
+          <>
+            {activeTab === 'categories' && (
+              <div style={{ direction: 'rtl' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.15rem', color: 'var(--dark-charcoal)', fontWeight: 800 }}>إدارة الفئات الهندسية</h3>
+                  <button 
+                    onClick={() => {
+                      setEditingData(null);
+                      setSubView('add-category');
+                    }}
+                    className="btn btn-primary" 
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', fontFamily: 'var(--font-arabic)' }}
+                  >
+                    <Plus size={15} style={{ marginLeft: '0.35rem' }} />
+                    <span>إضافة فئة جديدة</span>
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                  {categories.map(cat => (
+                    <div key={cat.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'right' }}>
+                      {cat.bannerImg && (
+                        <div style={{ height: '120px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
+                          <img src={cat.bannerImg} alt={cat.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                      <div>
+                        <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--dark-charcoal)', margin: 0 }}>{cat.title}</h4>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 600 }}>معرّف المسار: /{cat.id}</span>
+                        <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: '0.5rem 0 0 0' }}>{cat.desc}</p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
+                        <button 
+                          onClick={() => {
+                            setEditingData(cat);
+                            setSubView('edit-category');
+                          }}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center' }}
+                        >
+                          <Edit2 size={14} style={{ marginLeft: '0.25rem' }} />
+                          <span>تعديل</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6' }}
+                        >
+                          <Trash2 size={14} style={{ marginLeft: '0.25rem' }} />
+                          <span>حذف</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'projects' && (
+              <div style={{ direction: 'rtl' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.15rem', color: 'var(--dark-charcoal)', fontWeight: 800 }}>إدارة المشاريع (أعمالنا)</h3>
+                  <button 
+                    onClick={() => {
+                      setEditingData(null);
+                      setSubView('add-project');
+                    }}
+                    className="btn btn-primary" 
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', fontFamily: 'var(--font-arabic)' }}
+                  >
+                    <Plus size={15} style={{ marginLeft: '0.35rem' }} />
+                    <span>إضافة مشروع جديد</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                  {projects.map(proj => (
+                    <div key={proj.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'right' }}>
+                      {(proj.customImg || proj.defaultImg) && (
+                        <div style={{ height: '140px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
+                          <img src={proj.customImg || proj.defaultImg} alt={proj.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                      <div>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 700, backgroundColor: 'var(--ivory)', padding: '0.2rem 0.5rem', borderRadius: '3px' }}>
+                          {proj.category}
+                        </span>
+                        <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: '0.5rem 0 0 0' }}>{proj.title}</h4>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--warm-gray)', display: 'block' }}>{proj.subtitle}</span>
+                        <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: '0.5rem 0 0 0' }}>
+                          {proj.desc && proj.desc.length > 100 ? `${proj.desc.substring(0, 100)}...` : proj.desc}
+                        </p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-gray)' }}>
+                        <span>📍 {proj.location}</span>
+                        <span>•</span>
+                        <span>📐 {proj.space}</span>
+                        <span>•</span>
+                        <span>⏳ {proj.duration}</span>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
+                        <button 
+                          onClick={() => {
+                            setEditingData(proj);
+                            setSubView('edit-project');
+                          }}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center' }}
+                        >
+                          <Edit2 size={14} style={{ marginLeft: '0.25rem' }} />
+                          <span>تعديل التفاصيل</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteProject(proj.id)}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6' }}
+                        >
+                          <Trash2 size={14} style={{ marginLeft: '0.25rem' }} />
+                          <span>حذف</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'contact' && (
+              <div className="card" style={{ padding: '2.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', direction: 'rtl', textAlign: 'right' }}>
+                <h3 style={{ fontSize: '1.2rem', color: 'var(--dark-charcoal)', fontWeight: 800, marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem' }}>
+                  تعديل بيانات التواصل والموقع الأساسية
+                </h3>
+                
+                <form onSubmit={handleContactSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="contact-admin-form">
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">العنوان الفعلي (المقر الرئيسي)</label>
+                    <input 
+                      type="text" 
+                      name="address" 
+                      className="form-control" 
+                      defaultValue={contactData.address || ''} 
+                      placeholder="مثال: التجمع الخامس - الحي الثاني..."
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">رقم الهاتف الظاهر للمراسلة</label>
+                    <input 
+                      type="text" 
+                      name="phone" 
+                      className="form-control" 
+                      defaultValue={contactData.phone || ''} 
+                      placeholder="مثال: 01111 014 008"
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">البريد الإلكتروني الأساسي</label>
+                    <input 
+                      type="email" 
+                      name="email" 
+                      className="form-control" 
+                      defaultValue={contactData.email || ''} 
+                      placeholder="مثال: info@aura-nest.net"
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">رقم الواتساب الدولي (للإرسال المباشر)</label>
+                    <input 
+                      type="text" 
+                      name="whatsapp" 
+                      className="form-control" 
+                      defaultValue={contactData.whatsapp || ''} 
+                      placeholder="مثال: 201111014008"
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">رابط صفحة الفيسبوك (Facebook)</label>
+                    <input 
+                      type="text" 
+                      name="facebook" 
+                      className="form-control" 
+                      defaultValue={contactData.facebook || ''} 
+                      placeholder="مثال: https://www.facebook.com/..."
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">رابط حساب الإنستجرام (Instagram)</label>
+                    <input 
+                      type="text" 
+                      name="instagram" 
+                      className="form-control" 
+                      defaultValue={contactData.instagram || ''} 
+                      placeholder="مثال: https://instagram.com/..."
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
+                    <label className="form-label">ساعات وأيام العمل الرسمية</label>
+                    <input 
+                      type="text" 
+                      name="hours" 
+                      className="form-control" 
+                      defaultValue={contactData.hours || ''} 
+                      placeholder="مثال: ١٠ ص — ٨ م (يومياً عدا الجمعة)"
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
+                      <Save size={16} style={{ marginLeft: '0.5rem' }} />
+                      <span>حفظ وتحديث بيانات الاتصال</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </>
         )}
 
-        {!loading && activeTab === 'projects' && (
-          <div style={{ direction: 'rtl' }}>
-            {/* Top Bar inside Tab */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.3rem', color: 'var(--dark-charcoal)', fontWeight: 800 }}>إدارة المشاريع (أعمالنا)</h3>
-              <button 
-                onClick={() => setProjectModal({ open: true, isEdit: false, data: null })}
-                className="btn btn-primary" 
-                style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}
-              >
-                <Plus size={16} style={{ marginLeft: '0.5rem' }} />
-                <span>إضافة مشروع جديد</span>
-              </button>
-            </div>
-
-            {/* Projects Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-              {projects.map(proj => (
-                <div key={proj.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'right' }}>
-                  {(proj.customImg || proj.defaultImg) && (
-                    <div style={{ height: '140px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
-                      <img src={proj.customImg || proj.defaultImg} alt={proj.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  )}
-                  <div>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 700, backgroundColor: 'var(--ivory)', padding: '0.2rem 0.5rem', borderRadius: '3px' }}>
-                      {proj.category}
-                    </span>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: '0.5rem 0 0 0' }}>{proj.title}</h4>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--warm-gray)', display: 'block' }}>{proj.subtitle}</span>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: '0.5rem 0 0 0' }}>
-                      {proj.desc && proj.desc.length > 100 ? `${proj.desc.substring(0, 100)}...` : proj.desc}
-                    </p>
-                  </div>
-                  
-                  {/* Specs summary tag preview */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-gray)' }}>
-                    <span>📍 {proj.location}</span>
-                    <span>•</span>
-                    <span>📐 {proj.space}</span>
-                    <span>•</span>
-                    <span>⏳ {proj.duration}</span>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
-                    <button 
-                      onClick={() => setProjectModal({ open: true, isEdit: true, data: proj })}
-                      className="btn" 
-                      style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center' }}
-                    >
-                      <Edit2 size={14} style={{ marginLeft: '0.25rem' }} />
-                      <span>تعديل التفاصيل</span>
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteProject(proj.id)}
-                      className="btn" 
-                      style={{ flexGrow: 1, padding: '0.5rem', fontSize: '0.85rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6' }}
-                    >
-                      <Trash2 size={14} style={{ marginLeft: '0.25rem' }} />
-                      <span>حذف</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!loading && activeTab === 'contact' && (
+        {/* ADD/EDIT CATEGORY VIEW */}
+        {(subView === 'add-category' || subView === 'edit-category') && (
           <div className="card" style={{ padding: '2.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', direction: 'rtl', textAlign: 'right' }}>
-            <h3 style={{ fontSize: '1.3rem', color: 'var(--dark-charcoal)', fontWeight: 800, marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem' }}>
-              تعديل بيانات التواصل والموقع الأساسية
-            </h3>
-            
-            <form onSubmit={handleContactSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="contact-admin-form">
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">العنوان الفعلي (المقر الرئيسي)</label>
-                <input 
-                  type="text" 
-                  name="address" 
-                  className="form-control" 
-                  defaultValue={contactData.address || ''} 
-                  placeholder="مثال: التجمع الخامس - الحي الثاني..."
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">رقم الهاتف الظاهر للمراسلة</label>
-                <input 
-                  type="text" 
-                  name="phone" 
-                  className="form-control" 
-                  defaultValue={contactData.phone || ''} 
-                  placeholder="مثال: 01111 014 008"
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">البريد الإلكتروني الأساسي</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  className="form-control" 
-                  defaultValue={contactData.email || ''} 
-                  placeholder="مثال: info@aura-nest.net"
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">رقم الواتساب الدولي (للإرسال المباشر)</label>
-                <input 
-                  type="text" 
-                  name="whatsapp" 
-                  className="form-control" 
-                  defaultValue={contactData.whatsapp || ''} 
-                  placeholder="مثال: 201111014008"
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">رابط صفحة الفيسبوك (Facebook)</label>
-                <input 
-                  type="text" 
-                  name="facebook" 
-                  className="form-control" 
-                  defaultValue={contactData.facebook || ''} 
-                  placeholder="مثال: https://www.facebook.com/..."
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">رابط حساب الإنستجرام (Instagram)</label>
-                <input 
-                  type="text" 
-                  name="instagram" 
-                  className="form-control" 
-                  defaultValue={contactData.instagram || ''} 
-                  placeholder="مثال: https://instagram.com/..."
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
-                <label className="form-label">ساعات وأيام العمل الرسمية</label>
-                <input 
-                  type="text" 
-                  name="hours" 
-                  className="form-control" 
-                  defaultValue={contactData.hours || ''} 
-                  placeholder="مثال: ١٠ ص — ٨ م (يومياً عدا الجمعة)"
-                />
-              </div>
-
-              <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
-                <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
-                  <Save size={16} style={{ marginLeft: '0.5rem' }} />
-                  <span>حفظ وتحديث بيانات الاتصال</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-      </div>
-
-      {/* Categories Add/Edit Modal */}
-      {categoryModal.open && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(63, 64, 66, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '1rem' }}>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="card"
-            style={{ width: '100%', maxWidth: '500px', padding: '2rem', backgroundColor: 'var(--white)', textAlign: 'right', direction: 'rtl', position: 'relative' }}
-          >
-            <button 
-              onClick={() => setCategoryModal({ open: false, isEdit: false, data: null })}
-              style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-gray)' }}
-            >
-              <X size={20} />
-            </button>
-
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '1.5rem', borderRight: '3px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
-              {categoryModal.isEdit ? 'تعديل الفئة الهندسية' : 'إضافة فئة هندسية جديدة'}
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '2rem', borderRight: '3px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
+              {subView === 'edit-category' ? 'تعديل الفئة الهندسية' : 'إضافة فئة هندسية جديدة'}
             </h3>
 
-            <form onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '600px' }}>
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label">معرّف الفئة (ID) بالإنجليزية (يُستخدم للرابط الإلكتروني)*</label>
                 <input 
                   type="text" 
                   name="id" 
                   className="form-control" 
-                  placeholder="مثال: design"
-                  defaultValue={categoryModal.data?.id || ''}
-                  disabled={categoryModal.isEdit}
+                  placeholder="مثال: interior"
+                  defaultValue={editingData?.id || ''}
+                  disabled={subView === 'edit-category'}
                   required
                 />
               </div>
@@ -659,7 +663,7 @@ export default function AdminPanel() {
                   name="title" 
                   className="form-control" 
                   placeholder="مثال: التصميم الداخلي والديكور"
-                  defaultValue={categoryModal.data?.title || ''}
+                  defaultValue={editingData?.title || ''}
                   required
                 />
               </div>
@@ -670,8 +674,8 @@ export default function AdminPanel() {
                   name="desc" 
                   className="form-control" 
                   placeholder="اكتب وصفاً معبراً عن هذا التخصص الهندسي..."
-                  defaultValue={categoryModal.data?.desc || ''}
-                  rows="3"
+                  defaultValue={editingData?.desc || ''}
+                  rows="4"
                   style={{ resize: 'none' }}
                 />
               </div>
@@ -705,10 +709,7 @@ export default function AdminPanel() {
                         if (file) {
                           try {
                             const b64 = await convertFileToBase64(file);
-                            setCategoryModal(prev => ({
-                              ...prev,
-                              data: { ...prev.data, bannerImg: b64 }
-                            }));
+                            setEditingData(prev => ({ ...prev, bannerImg: b64 }));
                           } catch (err) {
                             console.error(err);
                           }
@@ -716,44 +717,43 @@ export default function AdminPanel() {
                       }}
                     />
                   </label>
-                  {categoryModal.data?.bannerImg && (
-                    <div style={{ width: '50px', height: '50px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
-                      <img src={categoryModal.data.bannerImg} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {editingData?.bannerImg && (
+                    <div style={{ width: '60px', height: '60px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
+                      <img src={editingData.bannerImg} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   )}
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', padding: '0.9rem' }}>
-                <Save size={16} style={{ marginLeft: '0.5rem' }} />
-                <span>حفظ الفئة</span>
-              </button>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
+                  <Save size={16} style={{ marginLeft: '0.5rem' }} />
+                  <span>حفظ وتثبيت الفئة</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setSubView('list');
+                    setEditingData(null);
+                  }}
+                  className="btn" 
+                  style={{ padding: '0.8rem 2rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)' }}
+                >
+                  إلغاء
+                </button>
+              </div>
             </form>
-          </motion.div>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Projects Add/Edit Modal */}
-      {projectModal.open && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(63, 64, 66, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '1rem', overflowY: 'auto' }}>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="card"
-            style={{ width: '100%', maxWidth: '680px', padding: '2rem', backgroundColor: 'var(--white)', textAlign: 'right', direction: 'rtl', position: 'relative', margin: 'auto' }}
-          >
-            <button 
-              onClick={() => setProjectModal({ open: false, isEdit: false, data: null })}
-              style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-gray)' }}
-            >
-              <X size={20} />
-            </button>
-
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '1.5rem', borderRight: '3px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
-              {projectModal.isEdit ? 'تعديل تفاصيل المشروع' : 'إضافة مشروع جديد للمعرض'}
+        {/* ADD/EDIT PROJECT VIEW */}
+        {(subView === 'add-project' || subView === 'edit-project') && (
+          <div className="card" style={{ padding: '2.5rem', backgroundColor: 'var(--white)', border: '1px solid var(--light-beige)', direction: 'rtl', textAlign: 'right' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '2rem', borderRight: '3px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
+              {subView === 'edit-project' ? 'تعديل تفاصيل المشروع' : 'إضافة مشروع جديد للمعرض'}
             </h3>
 
-            <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
                 <label className="form-label">عنوان المشروع الأساسي*</label>
                 <input 
@@ -761,7 +761,7 @@ export default function AdminPanel() {
                   name="title" 
                   className="form-control" 
                   placeholder="مثال: شقة سكنية فاخرة - التجمع"
-                  defaultValue={projectModal.data?.title || ''}
+                  defaultValue={editingData?.title || ''}
                   required
                 />
               </div>
@@ -773,7 +773,7 @@ export default function AdminPanel() {
                   name="subtitle" 
                   className="form-control" 
                   placeholder="مثال: فخامة معاصرة — التجمع الخامس"
-                  defaultValue={projectModal.data?.subtitle || ''}
+                  defaultValue={editingData?.subtitle || ''}
                 />
               </div>
 
@@ -782,7 +782,7 @@ export default function AdminPanel() {
                 <select 
                   name="category" 
                   className="form-control" 
-                  defaultValue={projectModal.data?.category || ''}
+                  defaultValue={editingData?.category || ''}
                   required
                 >
                   <option value="" disabled>اختر القسم...</option>
@@ -798,13 +798,12 @@ export default function AdminPanel() {
                   name="desc" 
                   className="form-control" 
                   placeholder="اكتب وصفاً مفصلاً لكافة تفاصيل الأعمال واللمسات الهندسية..."
-                  defaultValue={projectModal.data?.desc || ''}
-                  rows="4"
+                  defaultValue={editingData?.desc || ''}
+                  rows="5"
                   style={{ resize: 'none' }}
                 />
               </div>
 
-              {/* Specs & Materials fields */}
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label">المساحة المقدرة</label>
                 <input 
@@ -812,7 +811,7 @@ export default function AdminPanel() {
                   name="space" 
                   className="form-control" 
                   placeholder="مثال: 450 م²"
-                  defaultValue={projectModal.data?.space || ''}
+                  defaultValue={editingData?.space || ''}
                 />
               </div>
 
@@ -823,7 +822,7 @@ export default function AdminPanel() {
                   name="duration" 
                   className="form-control" 
                   placeholder="مثال: 5 أشهر"
-                  defaultValue={projectModal.data?.duration || ''}
+                  defaultValue={editingData?.duration || ''}
                 />
               </div>
 
@@ -834,7 +833,7 @@ export default function AdminPanel() {
                   name="year" 
                   className="form-control" 
                   placeholder="مثال: 2025"
-                  defaultValue={projectModal.data?.year || ''}
+                  defaultValue={editingData?.year || ''}
                 />
               </div>
 
@@ -845,7 +844,7 @@ export default function AdminPanel() {
                   name="location" 
                   className="form-control" 
                   placeholder="مثال: التجمع الخامس، القاهرة"
-                  defaultValue={projectModal.data?.location || ''}
+                  defaultValue={editingData?.location || ''}
                 />
               </div>
 
@@ -856,11 +855,10 @@ export default function AdminPanel() {
                   name="materials" 
                   className="form-control" 
                   placeholder="مثال: رخام طبيعي، خشب أرو، إضاءة مخفية ذكية"
-                  defaultValue={projectModal.data?.materials || ''}
+                  defaultValue={editingData?.materials || ''}
                 />
               </div>
 
-              {/* Main Image upload */}
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label">الصورة الرئيسية للمشروع</label>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -890,10 +888,7 @@ export default function AdminPanel() {
                         if (file) {
                           try {
                             const b64 = await convertFileToBase64(file);
-                            setProjectModal(prev => ({
-                              ...prev,
-                              data: { ...prev.data, defaultImg: b64 }
-                            }));
+                            setEditingData(prev => ({ ...prev, defaultImg: b64 }));
                           } catch (err) {
                             console.error(err);
                           }
@@ -901,15 +896,14 @@ export default function AdminPanel() {
                       }}
                     />
                   </label>
-                  {projectModal.data?.defaultImg && (
+                  {editingData?.defaultImg && (
                     <div style={{ width: '42px', height: '42px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
-                      <img src={projectModal.data.defaultImg} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={editingData.defaultImg} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Multiple Gallery Images upload */}
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label">معرض الصور الكامل للمشروع</label>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -941,12 +935,9 @@ export default function AdminPanel() {
                           try {
                             const promises = files.map(file => convertFileToBase64(file));
                             const b64s = await Promise.all(promises);
-                            setProjectModal(prev => ({
-                              ...prev,
-                              data: { 
-                                ...prev.data, 
-                                gallery: [...(prev.data?.gallery || []), ...b64s] 
-                              }
+                            setEditingData(prev => ({ 
+                              ...prev, 
+                              gallery: [...(prev?.gallery || []), ...b64s] 
                             }));
                           } catch (err) {
                             console.error(err);
@@ -955,28 +946,24 @@ export default function AdminPanel() {
                       }}
                     />
                   </label>
-                  {projectModal.data?.gallery && projectModal.data.gallery.length > 0 && (
+                  {editingData?.gallery && editingData.gallery.length > 0 && (
                     <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-gold)', whiteSpace: 'nowrap' }}>
-                      ({projectModal.data.gallery.length} صور)
+                      ({editingData.gallery.length} صور)
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Gallery Image Previews inside modal to support individual deletions */}
-              {projectModal.data?.gallery && projectModal.data.gallery.length > 0 && (
+              {editingData?.gallery && editingData.gallery.length > 0 && (
                 <div style={{ gridColumn: 'span 2', display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.5rem 0', borderTop: '1px solid var(--light-beige)' }}>
-                  {projectModal.data.gallery.map((img, idx) => (
+                  {editingData.gallery.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)', flexShrink: 0 }}>
                       <img src={img} alt="Gallery Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <button 
                         type="button" 
                         onClick={() => {
-                          const updatedGallery = projectModal.data.gallery.filter((_, i) => i !== idx);
-                          setProjectModal(prev => ({
-                            ...prev,
-                            data: { ...prev.data, gallery: updatedGallery }
-                          }));
+                          const updatedGallery = editingData.gallery.filter((_, i) => i !== idx);
+                          setEditingData(prev => ({ ...prev, gallery: updatedGallery }));
                         }}
                         style={{ position: 'absolute', top: 2, left: 2, background: 'rgba(231, 76, 60, 0.8)', border: 'none', borderRadius: '50%', width: '18px', height: '18px', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                       >
@@ -988,23 +975,26 @@ export default function AdminPanel() {
               )}
 
               <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button type="submit" className="btn btn-primary" style={{ flexGrow: 1, justifyContent: 'center', padding: '0.9rem' }}>
+                <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
                   <Save size={16} style={{ marginLeft: '0.5rem' }} />
                   <span>حفظ وتثبيت المشروع</span>
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => setProjectModal({ open: false, isEdit: false, data: null })}
+                  onClick={() => {
+                    setSubView('list');
+                    setEditingData(null);
+                  }}
                   className="btn" 
-                  style={{ flexGrow: 1, justifyContent: 'center', padding: '0.9rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)' }}
+                  style={{ padding: '0.8rem 2rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)' }}
                 >
                   إلغاء
                 </button>
               </div>
             </form>
-          </motion.div>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       <style>{`
         @keyframes spin {
