@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Lock, Plus, Edit2, Trash2, Save,
-  Layers, Briefcase, PhoneCall, Upload, AlertCircle, CheckCircle, Globe
+  Layers, Briefcase, PhoneCall, Upload, AlertCircle, CheckCircle, Globe, Languages
 } from 'lucide-react';
 import { 
   getProjects, fetchProjectsFromSupabase, addProject, updateProject, deleteProject,
@@ -107,7 +107,6 @@ export default function AdminPanel() {
           ...prev,
           [fieldName]: translatedText
         }));
-        showAlert('تمت الترجمة التلقائية وملء الحقل بنجاح ✨');
       } else {
         showAlert('فشلت الترجمة التلقائية، يرجى المحاولة مجدداً أو تعبئته يدوياً', 'error');
       }
@@ -909,9 +908,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('titleEn', document.getElementById('cat_title_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للفئة
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للفئة</span>
                   </button>
                 </div>
                 <input 
@@ -944,9 +944,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('descEn', document.getElementById('cat_desc_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للوصف
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للوصف</span>
                   </button>
                 </div>
                 <textarea 
@@ -1057,9 +1058,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('titleEn', document.getElementById('proj_title_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للعنوان
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للعنوان</span>
                   </button>
                 </div>
                 <input 
@@ -1094,9 +1096,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('subtitleEn', document.getElementById('proj_subtitle_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للعنوان الفرعي
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للعنوان الفرعي</span>
                   </button>
                 </div>
                 <input 
@@ -1152,9 +1155,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('descEn', document.getElementById('proj_desc_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للوصف
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للوصف</span>
                   </button>
                 </div>
                 <textarea 
@@ -1215,9 +1219,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('durationEn', document.getElementById('proj_duration_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للمدة
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للمدة</span>
                   </button>
                 </div>
                 <input 
@@ -1252,9 +1257,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('locationEn', document.getElementById('proj_location_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للموقع
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للموقع</span>
                   </button>
                 </div>
                 <input 
@@ -1289,9 +1295,10 @@ export default function AdminPanel() {
                   <button
                     type="button"
                     onClick={() => handleAutoTranslate('materialsEn', document.getElementById('proj_materials_ar')?.value)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    ✨ ترجمة تلقائية للمواصفات
+                    <Languages size={13} />
+                    <span>ترجمة تلقائية للمواصفات</span>
                   </button>
                 </div>
                 <input 
