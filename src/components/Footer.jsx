@@ -3,8 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { Phone, MapPin, Heart, Mail } from 'lucide-react';
 import { getContactInfo, fetchContactInfoFromSupabase } from '../utils/projectData';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function Footer() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,7 +56,8 @@ export default function Footer() {
         paddingTop: '5rem',
         paddingBottom: '2rem',
         borderTop: '3px solid var(--primary-gold)',
-        position: 'relative'
+        position: 'relative',
+        direction: isRtl ? 'rtl' : 'ltr'
       }}
     >
       <div className="container">
@@ -61,18 +68,19 @@ export default function Footer() {
             gap: '3rem',
             borderBottom: '1px solid rgba(138, 136, 132, 0.2)',
             paddingBottom: '3.5rem',
-            textAlign: 'right'
+            textAlign: isRtl ? 'right' : 'left'
           }}
           className="footer-grid"
         >
           {/* Logo and Slogan Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Custom styled light logo for dark BG */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', alignItems: isRtl ? 'flex-start' : 'flex-start' }}>
             <div onClick={() => handleScrollTo('hero')} style={{ cursor: 'pointer' }}>
               <Logo showText={true} isWhite={true} />
             </div>
             <p style={{ fontSize: '0.92rem', color: 'var(--light-beige)', opacity: 0.8, lineHeight: '1.6', maxWidth: '300px' }}>
-              منظومة هندسية متكاملة من الفكرة حتى المفتاح — تصميم داخلي، تشطيبات فاخرة، وإشراف هندسي شامل للمساحات السكنية والتجارية.
+              {isRtl 
+                ? 'منظومة هندسية متكاملة من الفكرة حتى المفتاح — تصميم داخلي، تشطيبات فاخرة، وإشراف هندسي شامل للمساحات السكنية والتجارية.'
+                : 'An integrated engineering system from concept to key — interior design, premium finishes, and comprehensive engineering supervision for residential & commercial spaces.'}
             </p>
             {/* Social Media Links */}
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-start', marginTop: '0.25rem' }}>
@@ -89,7 +97,7 @@ export default function Footer() {
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-gold)'}
                 onMouseLeave={(e) => e.currentTarget.style.color = 'var(--light-beige)'}
-                title="تابعنا على فيسبوك"
+                title="Facebook"
               >
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                   <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.95z"/>
@@ -108,7 +116,7 @@ export default function Footer() {
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-gold)'}
                 onMouseLeave={(e) => e.currentTarget.style.color = 'var(--light-beige)'}
-                title="تابعنا على إنستجرام"
+                title="Instagram"
               >
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -121,15 +129,23 @@ export default function Footer() {
 
           {/* Quick Links Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <h4 style={{ fontSize: '1.15rem', color: 'var(--white)', fontWeight: 700, borderRight: '2.5px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
-              روابط سريعة
+            <h4 style={{ 
+              fontSize: '1.15rem', 
+              color: 'var(--white)', 
+              fontWeight: 700, 
+              borderRight: isRtl ? '2.5px solid var(--primary-gold)' : 'none', 
+              borderLeft: isRtl ? 'none' : '2.5px solid var(--primary-gold)', 
+              paddingRight: isRtl ? '0.5rem' : '0',
+              paddingLeft: isRtl ? '0' : '0.5rem'
+            }}>
+              {t.footerNavTitle}
             </h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
               {[
-                { id: 'about', name: 'من نحن' },
-                { id: 'services', name: 'خدماتنا' },
-                { id: 'portfolio', name: 'أعمالنا' },
-                { id: 'contact', name: 'تواصل معنا' }
+                { id: 'about', name: t.navAbout },
+                { id: 'services', name: t.navServices },
+                { id: 'portfolio', name: t.navPortfolio },
+                { id: 'contact', name: t.navContact }
               ].map((link) => (
                 <li key={link.id}>
                   <button
@@ -141,7 +157,8 @@ export default function Footer() {
                       fontSize: '0.92rem',
                       cursor: 'pointer',
                       fontFamily: 'var(--font-arabic)',
-                      transition: 'all var(--transition-fast)'
+                      transition: 'all var(--transition-fast)',
+                      padding: 0
                     }}
                     className="footer-link-btn"
                   >
@@ -154,8 +171,16 @@ export default function Footer() {
 
           {/* Contact Details Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <h4 style={{ fontSize: '1.15rem', color: 'var(--white)', fontWeight: 700, borderRight: '2.5px solid var(--primary-gold)', paddingRight: '0.5rem' }}>
-              معلومات الاتصال
+            <h4 style={{ 
+              fontSize: '1.15rem', 
+              color: 'var(--white)', 
+              fontWeight: 700, 
+              borderRight: isRtl ? '2.5px solid var(--primary-gold)' : 'none', 
+              borderLeft: isRtl ? 'none' : '2.5px solid var(--primary-gold)', 
+              paddingRight: isRtl ? '0.5rem' : '0',
+              paddingLeft: isRtl ? '0' : '0.5rem'
+            }}>
+              {t.footerContactTitle}
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
@@ -205,44 +230,27 @@ export default function Footer() {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: isRtl ? 'row' : 'row-reverse',
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: '1rem',
             paddingTop: '2rem',
             fontSize: '0.85rem',
-            color: 'var(--warm-gray)'
+            color: 'var(--warm-gray)',
+            flexWrap: 'wrap'
           }}
           className="footer-bottom-bar"
         >
           <span>
-            جميع الحقوق محفوظة © {currentYear} AURA NEST — رؤيتنا تصنع أحلامك
+            {isRtl 
+              ? `جميع الحقوق محفوظة © ${currentYear} AURA NEST — رؤيتنا تصنع أحلامك`
+              : `All rights reserved © ${currentYear} AURA NEST — Our vision shapes your dreams`}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            بُني بكل إتقان <Heart size={12} style={{ color: 'var(--primary-gold)', fill: 'var(--primary-gold)' }} /> لأجل مساحاتكم الفاخرة
+            {isRtl ? 'صُنع بكل حب وشغف هندسي' : 'Crafted with engineering passion'} <Heart size={12} style={{ color: 'var(--primary-gold)', fill: 'var(--primary-gold)' }} />
           </span>
         </div>
       </div>
-
-      <style>{`
-        .footer-link-btn:hover {
-          color: var(--primary-gold) !important;
-          transform: translateX(-4px);
-        }
-        .footer-phone-link:hover,
-        .footer-email-link:hover {
-          color: var(--primary-gold) !important;
-        }
-        @media (min-width: 768px) {
-          .footer-bottom-bar {
-            flex-direction: row-reverse !important;
-          }
-        }
-        /* Custom adjustment of logo text colors for dark bg */
-        footer .brand-text {
-          color: var(--white) !important;
-        }
-      `}</style>
     </footer>
   );
 }

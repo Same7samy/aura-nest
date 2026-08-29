@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Compass, Hammer, Palette, Layers, ClipboardCheck, Building } from 'lucide-react';
 import { getProjects, fetchProjectsFromSupabase, getCategories, fetchCategoriesFromSupabase } from '../utils/projectData';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function Portfolio() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const [categoryImages, setCategoryImages] = useState({});
   const [projects, setProjects] = useState(getProjects());
   const [categories, setCategories] = useState(getCategories());
@@ -57,9 +63,13 @@ export default function Portfolio() {
     <section id="portfolio" className="section-padding" style={{ backgroundColor: 'var(--ivory)' }}>
       <div className="container">
         
-        <div className="section-title-wrapper">
-          <span className="section-subtitle">أعمالنا</span>
-          <h2 className="section-main-title">تصفح مشاريعنا حسب قطاعات الهندسة والتشطيب</h2>
+        <div className="section-title-wrapper" style={{ textAlign: isRtl ? 'right' : 'left' }}>
+          <span className="section-subtitle" style={{ right: isRtl ? 0 : 'auto', left: isRtl ? 'auto' : 0, transform: 'none' }}>
+            {t.navPortfolio}
+          </span>
+          <h2 className="section-main-title">
+            {isRtl ? 'تصفح مشاريعنا حسب قطاعات الهندسة والتشطيب' : 'Browse Projects by Engineering Sectors'}
+          </h2>
         </div>
 
         <div
@@ -71,6 +81,8 @@ export default function Portfolio() {
           {categories.map((cat) => {
             const projectCount = getCategoryCount(cat.title);
             const bgImg = categoryImages[cat.id] || '';
+            const catTitle = (!isRtl && cat.titleEn) ? cat.titleEn : cat.title;
+            const catDesc = (!isRtl && cat.descEn) ? cat.descEn : cat.desc;
             
             return (
               <Link
@@ -94,7 +106,7 @@ export default function Portfolio() {
                 <div style={{ position: 'relative', height: '200px', width: '100%', overflow: 'hidden', borderRadius: '6px 6px 0 0' }}>
                   <img
                     src={bgImg}
-                    alt={cat.title}
+                    alt={catTitle}
                     className="category-image"
                     style={{
                       width: '100%',
@@ -120,7 +132,8 @@ export default function Portfolio() {
                   style={{
                     position: 'absolute',
                     top: '178px',
-                    right: '24px',
+                    right: isRtl ? '24px' : 'auto',
+                    left: isRtl ? 'auto' : '24px',
                     width: '46px',
                     height: '46px',
                     borderRadius: '50%',
@@ -136,7 +149,6 @@ export default function Portfolio() {
                   {getIcon(cat.id)}
                 </div>
 
-
                 <div
                   style={{
                     padding: '2.25rem 1.75rem 2rem 1.75rem',
@@ -144,12 +156,12 @@ export default function Portfolio() {
                     flexDirection: 'column',
                     gap: '0.85rem',
                     flexGrow: 1,
-                    textAlign: 'right'
+                    textAlign: isRtl ? 'right' : 'left'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row' : 'row-reverse' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--dark-charcoal)', margin: 0 }}>
-                      {cat.title}
+                      {catTitle}
                     </h3>
                     <span style={{
                       fontSize: '0.75rem',
@@ -160,17 +172,33 @@ export default function Portfolio() {
                       borderRadius: '20px',
                       flexShrink: 0
                     }}>
-                      {projectCount} مشاريع
+                      {isRtl ? `${projectCount} مشاريع` : `${projectCount} Projects`}
                     </span>
                   </div>
 
                   <p style={{ fontSize: '0.94rem', color: 'var(--text-gray)', lineHeight: 1.6, margin: 0 }}>
-                    {cat.desc}
+                    {catDesc}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: 'var(--primary-gold)', fontWeight: 700, fontSize: '0.9rem' }}>
-                    <span>تصفح أعمال القطاع</span>
-                    <ArrowLeft size={16} style={{ transition: 'transform 0.3s' }} className="arrow-icon" />
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem', 
+                    marginTop: '0.5rem', 
+                    color: 'var(--primary-gold)', 
+                    fontWeight: 700, 
+                    fontSize: '0.9rem',
+                    flexDirection: isRtl ? 'row' : 'row'
+                  }}>
+                    <span>{isRtl ? 'تصفح أعمال القطاع' : 'Browse Sector Projects'}</span>
+                    <ArrowLeft 
+                      size={16} 
+                      style={{ 
+                        transition: 'transform 0.3s',
+                        transform: isRtl ? 'none' : 'rotate(180deg)'
+                      }} 
+                      className="arrow-icon" 
+                    />
                   </div>
                 </div>
               </Link>

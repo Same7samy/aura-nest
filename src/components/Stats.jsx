@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 function CountUp({ to, duration = 2, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -31,7 +32,10 @@ function CountUp({ to, duration = 2, suffix = '' }) {
 }
 
 export default function Stats() {
-  const statsList = [
+  const { lang } = useLanguage();
+  const isRtl = lang === 'ar';
+
+  const statsAr = [
     {
       value: '50',
       suffix: '+',
@@ -51,6 +55,29 @@ export default function Stats() {
       desc: 'رقابة ميدانية يومية صارمة وتقارير فنية مرحلية لضمان الالتزام المطلق بالمعايير والمخططات المعتمدة.'
     }
   ];
+
+  const statsEn = [
+    {
+      value: '50',
+      suffix: '+',
+      title: 'Executed Projects',
+      desc: 'Residential and commercial structures delivered with high-precision finishes and engineering details.'
+    },
+    {
+      value: '6',
+      suffix: '',
+      title: 'Integrated Services',
+      desc: 'From preliminary architectural design to final decorative details and luxury furnishings.'
+    },
+    {
+      value: '100',
+      suffix: '%',
+      title: 'Engineering Supervision',
+      desc: 'Strict daily field supervision and periodic technical reports to ensure absolute compliance.'
+    }
+  ];
+
+  const statsList = isRtl ? statsAr : statsEn;
 
   return (
     <section

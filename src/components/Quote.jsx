@@ -1,7 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Quote() {
+  const { lang } = useLanguage();
+  const isRtl = lang === 'ar';
+
   return (
     <section
       style={{
@@ -76,10 +80,13 @@ export default function Quote() {
               lineHeight: '1.6',
               marginBottom: '1rem',
               position: 'relative',
-              zIndex: 2
+              zIndex: 2,
+              fontFamily: 'var(--font-arabic)'
             }}
           >
-            نبني رؤية أحلامكم — بعقلية هندسية، وتفاصيل تليق بتطلعاتكم.
+            {isRtl 
+              ? 'نبني رؤية أحلامكم — بعقلية هندسية، وتفاصيل تليق بتطلعاتكم.'
+              : 'Building your dream vision — with an engineering mindset, and details worthy of your aspirations.'}
           </blockquote>
 
           {/* Golden signature dash */}

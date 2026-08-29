@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Lock, Plus, Edit2, Trash2, Save,
-  Layers, Briefcase, PhoneCall, Upload, AlertCircle, CheckCircle
+  Layers, Briefcase, PhoneCall, Upload, AlertCircle, CheckCircle, Globe
 } from 'lucide-react';
 import { 
   getProjects, fetchProjectsFromSupabase, addProject, updateProject, deleteProject,
@@ -91,6 +91,33 @@ export default function AdminPanel() {
     }, 3000);
   };
 
+  // Auto-Translation Helper Function
+  const handleAutoTranslate = async (fieldName, sourceVal) => {
+    if (!sourceVal || !sourceVal.trim()) {
+      showAlert('يرجى كتابة النص باللغة العربية أولاً ليتم ترجمته', 'error');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceVal)}&langpair=ar|en`);
+      const data = await res.json();
+      if (data && data.responseData && data.responseData.translatedText) {
+        const translatedText = data.responseData.translatedText;
+        setEditingData(prev => ({
+          ...prev,
+          [fieldName]: translatedText
+        }));
+        showAlert('تمت الترجمة التلقائية وملء الحقل بنجاح ✨');
+      } else {
+        showAlert('فشلت الترجمة التلقائية، يرجى المحاولة مجدداً أو تعبئته يدوياً', 'error');
+      }
+    } catch (e) {
+      console.error('Translation error:', e);
+      showAlert('حدث خطأ أثناء الاتصال بخدمة الترجمة', 'error');
+    }
+    setLoading(false);
+  };
+
   // Auth Handler
   const handleLogin = (e) => {
     e.preventDefault();
@@ -102,7 +129,7 @@ export default function AdminPanel() {
     }
   };
 
-  // Base64 file converter with image compression to prevent exceeding localStorage quota
+  // Base64 file converter with image compression
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -151,7 +178,9 @@ export default function AdminPanel() {
     const catData = {
       id: (formData.get('id') || '').trim(),
       title: (formData.get('title') || '').trim(),
+      titleEn: (formData.get('titleEn') || '').trim(),
       desc: formData.get('desc'),
+      descEn: formData.get('descEn'),
       bannerImg: editingData?.bannerImg || ''
     };
 
@@ -205,14 +234,20 @@ export default function AdminPanel() {
     
     const projData = {
       title: (formData.get('title') || '').trim(),
+      titleEn: (formData.get('titleEn') || '').trim(),
       subtitle: (formData.get('subtitle') || '').trim(),
+      subtitleEn: (formData.get('subtitleEn') || '').trim(),
       desc: formData.get('desc'),
+      descEn: formData.get('descEn'),
       category: (formData.get('category') || '').trim(),
       space: (formData.get('space') || '').trim(),
       duration: (formData.get('duration') || '').trim(),
+      durationEn: (formData.get('durationEn') || '').trim(),
       year: (formData.get('year') || '').trim(),
       location: (formData.get('location') || '').trim(),
+      locationEn: (formData.get('locationEn') || '').trim(),
       materials: (formData.get('materials') || '').trim(),
+      materialsEn: (formData.get('materialsEn') || '').trim(),
       defaultImg: editingData?.defaultImg || '',
       gallery: editingData?.gallery || []
     };
@@ -282,7 +317,7 @@ export default function AdminPanel() {
     showAlert('تم تحديث بيانات التواصل بنجاح');
   };
 
-  // Password Lock view (renders centered block directly)
+  // Password Lock view
   if (!isAuthenticated) {
     return (
       <div style={{ minHeight: '90vh', backgroundColor: 'var(--ivory)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', direction: 'rtl' }}>
@@ -325,7 +360,7 @@ export default function AdminPanel() {
   return (
     <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', direction: 'rtl', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
       
-      {/* 1. BRANDED NAVBAR HEADER (styled exactly like the website's header navbar) */}
+      {/* BRANDED NAVBAR HEADER */}
       <header
         style={{
           position: 'sticky',
@@ -343,7 +378,6 @@ export default function AdminPanel() {
         }}
       >
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
-          {/* Right side: Logo & Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <Logo height={28} isWhite={false} />
             <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--dark-charcoal)', fontFamily: 'var(--font-arabic)', borderRight: '1px solid rgba(161, 154, 140, 0.3)', paddingRight: '0.75rem', marginRight: '0.75rem' }}>
@@ -351,7 +385,6 @@ export default function AdminPanel() {
             </span>
           </div>
 
-          {/* Left side: Navigation links (styled like the main navbar text links) */}
           {subView === 'list' && (
             <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
               <button 
@@ -466,7 +499,7 @@ export default function AdminPanel() {
         )}
       </AnimatePresence>
 
-      {/* Centered Confirmation Modal with Backdrop Blur */}
+      {/* Centered Confirmation Modal */}
       <AnimatePresence>
         {confirmModal.show && (
           <motion.div
@@ -554,9 +587,8 @@ export default function AdminPanel() {
         )}
       </AnimatePresence>
 
-      {/* Main Container below Header */}
+      {/* Main Container */}
       <div className="container" style={{ paddingTop: '2.5rem', paddingBottom: '4rem', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
-        {/* Tab Contents */}
         {loading && subView === 'list' && (
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <div style={{ width: '30px', height: '30px', border: '2px solid var(--light-beige)', borderTopColor: 'var(--primary-gold)', borderRadius: '50%', margin: '0 auto 0.75rem auto', animation: 'spin 1s infinite linear' }} />
@@ -604,6 +636,7 @@ export default function AdminPanel() {
                       )}
                       <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0, fontFamily: 'var(--font-arabic)' }}>{cat.title}</h4>
+                        {cat.titleEn && <span style={{ fontSize: '0.82rem', color: 'var(--text-gray)', display: 'block' }}>EN: {cat.titleEn}</span>}
                         <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 600 }}>معرّف المسار: /{cat.id}</span>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: 0 }}>{cat.desc}</p>
                       </div>
@@ -672,6 +705,7 @@ export default function AdminPanel() {
                           {proj.category}
                         </span>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: '0.5rem 0 0 0', fontFamily: 'var(--font-arabic)' }}>{proj.title}</h4>
+                        {proj.titleEn && <span style={{ fontSize: '0.82rem', color: 'var(--text-gray)', display: 'block' }}>EN: {proj.titleEn}</span>}
                         <span style={{ fontSize: '0.82rem', color: 'var(--warm-gray)', display: 'block' }}>{proj.subtitle}</span>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: 0 }}>
                           {proj.desc && proj.desc.length > 100 ? `${proj.desc.substring(0, 100)}...` : proj.desc}
@@ -856,9 +890,10 @@ export default function AdminPanel() {
               </div>
 
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>اسم الفئة (Title)*</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>اسم الفئة باللغة العربية (Title)*</label>
                 <input 
                   type="text" 
+                  id="cat_title_ar"
                   name="title" 
                   className="form-control" 
                   placeholder="مثال: التصميم الداخلي والديكور"
@@ -869,12 +904,57 @@ export default function AdminPanel() {
               </div>
 
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>وصف مختصر (Description)</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>اسم الفئة باللغة الإنجليزية (Title EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('titleEn', document.getElementById('cat_title_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للفئة
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  name="titleEn" 
+                  className="form-control" 
+                  placeholder="e.g. Interior Design & Decoration"
+                  value={editingData?.titleEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, titleEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>الوصف باللغة العربية (Description)</label>
                 <textarea 
+                  id="cat_desc_ar"
                   name="desc" 
                   className="form-control" 
                   placeholder="اكتب وصفاً معبراً عن هذا التخصص الهندسي..."
                   defaultValue={editingData?.desc || ''}
+                  rows="3"
+                  style={{ resize: 'none', fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>الوصف باللغة الإنجليزية (Description EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('descEn', document.getElementById('cat_desc_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للوصف
+                  </button>
+                </div>
+                <textarea 
+                  name="descEn" 
+                  className="form-control" 
+                  placeholder="e.g. Luxury interior design solutions..."
+                  value={editingData?.descEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, descEn: e.target.value }))}
                   rows="3"
                   style={{ resize: 'none', fontFamily: 'var(--font-arabic)' }}
                 />
@@ -954,10 +1034,13 @@ export default function AdminPanel() {
             </h3>
 
             <form key={editingData?.id || 'new-project'} onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              
+              {/* Title AR */}
               <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>عنوان المشروع الأساسي*</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>عنوان المشروع باللغة العربية*</label>
                 <input 
                   type="text" 
+                  id="proj_title_ar"
                   name="title" 
                   className="form-control" 
                   placeholder="مثال: شقة سكنية فاخرة - التجمع"
@@ -967,10 +1050,35 @@ export default function AdminPanel() {
                 />
               </div>
 
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>العنوان الفرعي (موقع أو طابع التنفيذ)</label>
+              {/* Title EN */}
+              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>عنوان المشروع باللغة الإنجليزية (Title EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('titleEn', document.getElementById('proj_title_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للعنوان
+                  </button>
+                </div>
                 <input 
                   type="text" 
+                  name="titleEn" 
+                  className="form-control" 
+                  placeholder="e.g. Luxury Apartment - Fifth Settlement"
+                  value={editingData?.titleEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, titleEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Subtitle AR */}
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>العنوان الفرعي باللغة العربية</label>
+                <input 
+                  type="text" 
+                  id="proj_subtitle_ar"
                   name="subtitle" 
                   className="form-control" 
                   placeholder="مثال: فخامة معاصرة — التجمع الخامس"
@@ -979,7 +1087,31 @@ export default function AdminPanel() {
                 />
               </div>
 
+              {/* Subtitle EN */}
               <div className="form-group" style={{ margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>العنوان الفرعي باللغة الإنجليزية (Subtitle EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('subtitleEn', document.getElementById('proj_subtitle_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للعنوان الفرعي
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  name="subtitleEn" 
+                  className="form-control" 
+                  placeholder="e.g. Contemporary Luxury — New Cairo"
+                  value={editingData?.subtitleEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, subtitleEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Category Dropdown */}
+              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
                 <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>القسم الهندسي التابع له*</label>
                 <select 
                   name="category" 
@@ -999,9 +1131,11 @@ export default function AdminPanel() {
                 </select>
               </div>
 
+              {/* Description AR */}
               <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>الوصف التفصيلي للمشروع والعمل الهندسي</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>الوصف التفصيلي باللغة العربية</label>
                 <textarea 
+                  id="proj_desc_ar"
                   name="desc" 
                   className="form-control" 
                   placeholder="اكتب وصفاً مفصلاً لكافة تفاصيل الأعمال واللمسات الهندسية..."
@@ -1011,8 +1145,32 @@ export default function AdminPanel() {
                 />
               </div>
 
+              {/* Description EN */}
+              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>الوصف التفصيلي باللغة الإنجليزية (Description EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('descEn', document.getElementById('proj_desc_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للوصف
+                  </button>
+                </div>
+                <textarea 
+                  name="descEn" 
+                  className="form-control" 
+                  placeholder="e.g. A complete luxury execution for a residential penthouse..."
+                  value={editingData?.descEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, descEn: e.target.value }))}
+                  rows="4"
+                  style={{ resize: 'none', fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Space */}
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>المساحة المقدرة</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>المساحة المقدرة (مشتركة لكلا اللغتين)</label>
                 <input 
                   type="text" 
                   name="space" 
@@ -1023,20 +1181,9 @@ export default function AdminPanel() {
                 />
               </div>
 
+              {/* Year */}
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>مدة التنفيذ</label>
-                <input 
-                  type="text" 
-                  name="duration" 
-                  className="form-control" 
-                  placeholder="مثال: 5 أشهر"
-                  defaultValue={editingData?.duration || ''}
-                  style={{ fontFamily: 'var(--font-arabic)' }}
-                />
-              </div>
-
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>عام الإنجاز</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>عام الإنجاز (مشتركة لكلا اللغتين)</label>
                 <input 
                   type="text" 
                   name="year" 
@@ -1047,10 +1194,49 @@ export default function AdminPanel() {
                 />
               </div>
 
+              {/* Duration AR */}
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>موقع المشروع التفصيلي</label>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>مدة التنفيذ باللغة العربية</label>
                 <input 
                   type="text" 
+                  id="proj_duration_ar"
+                  name="duration" 
+                  className="form-control" 
+                  placeholder="مثال: 5 أشهر"
+                  defaultValue={editingData?.duration || ''}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Duration EN */}
+              <div className="form-group" style={{ margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>مدة التنفيذ باللغة الإنجليزية (Duration EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('durationEn', document.getElementById('proj_duration_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للمدة
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  name="durationEn" 
+                  className="form-control" 
+                  placeholder="e.g. 5 Months"
+                  value={editingData?.durationEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, durationEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Location AR */}
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>موقع المشروع باللغة العربية</label>
+                <input 
+                  type="text" 
+                  id="proj_location_ar"
                   name="location" 
                   className="form-control" 
                   placeholder="مثال: التجمع الخامس، القاهرة"
@@ -1059,10 +1245,35 @@ export default function AdminPanel() {
                 />
               </div>
 
-              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
-                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>المواصفات الفنية والمواد الأساسية المستخدمة</label>
+              {/* Location EN */}
+              <div className="form-group" style={{ margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>الموقع باللغة الإنجليزية (Location EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('locationEn', document.getElementById('proj_location_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للموقع
+                  </button>
+                </div>
                 <input 
                   type="text" 
+                  name="locationEn" 
+                  className="form-control" 
+                  placeholder="e.g. Fifth Settlement, Cairo"
+                  value={editingData?.locationEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, locationEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Materials AR */}
+              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
+                <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>المواصفات والمواد المستخدمة باللغة العربية</label>
+                <input 
+                  type="text" 
+                  id="proj_materials_ar"
                   name="materials" 
                   className="form-control" 
                   placeholder="مثال: رخام طبيعي، خشب أرو، إضاءة مخفية ذكية"
@@ -1071,6 +1282,30 @@ export default function AdminPanel() {
                 />
               </div>
 
+              {/* Materials EN */}
+              <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>المواصفات والمواد باللغة الإنجليزية (Materials EN)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoTranslate('materialsEn', document.getElementById('proj_materials_ar')?.value)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)' }}
+                  >
+                    ✨ ترجمة تلقائية للمواصفات
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  name="materialsEn" 
+                  className="form-control" 
+                  placeholder="e.g. Natural marble, oak wood, smart indirect lighting"
+                  value={editingData?.materialsEn || ''}
+                  onChange={(e) => setEditingData(prev => ({ ...prev, materialsEn: e.target.value }))}
+                  style={{ fontFamily: 'var(--font-arabic)' }}
+                />
+              </div>
+
+              {/* Main Image */}
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>الصورة الرئيسية للمشروع</label>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -1117,6 +1352,7 @@ export default function AdminPanel() {
                 </div>
               </div>
 
+              {/* Gallery Images */}
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>معرض الصور الكامل للمشروع</label>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -1168,6 +1404,7 @@ export default function AdminPanel() {
                 </div>
               </div>
 
+              {/* Gallery Preview thumbnails */}
               {editingData?.gallery && editingData.gallery.length > 0 && (
                 <div style={{ gridColumn: 'span 2', display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.5rem 0', borderTop: '1px solid var(--light-beige)' }}>
                   {editingData.gallery.map((img, idx) => (

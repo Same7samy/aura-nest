@@ -9,6 +9,7 @@ import AdminPanel from './pages/AdminPanel';
 import Footer from './components/Footer';
 import SplashScreen from './components/SplashScreen';
 import PageLoader from './components/PageLoader';
+import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
   const { scrollYProgress } = useScroll();
@@ -55,7 +56,8 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
       {/* Scroll-bound Golden Progress Bar */}
       <motion.div
         style={{
@@ -87,7 +89,8 @@ export default function App() {
       </div>
       
       <FloatingWhatsApp />
-    </BrowserRouter>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

@@ -105,37 +105,49 @@ export const MAIN_CATEGORIES = [
   {
     id: 'architecture',
     title: 'التصميم المعماري الإبداعي',
+    titleEn: 'Creative Architectural Design',
     desc: 'صياغة الهيكل الخارجي والمخططات الهندسية الذكية للمنشآت.',
+    descEn: 'Crafting exterior facades and smart structural plans for buildings.',
     bannerImg: 'https://i.pinimg.com/736x/4b/4a/a0/4b4aa063d26ddab99795940fcb9a5271.jpg'
   },
   {
     id: 'contracting',
     title: 'المقاولات والأعمال الإنشائية والتشطيبية',
+    titleEn: 'Contracting & Integrated Execution',
     desc: 'تنفيذ أعمال البناء المتكاملة والخرسانة والتشطيب الفاخر.',
+    descEn: 'Execution of integrated construction, concrete structures, and luxury finishes.',
     bannerImg: 'https://i.pinimg.com/736x/e3/52/4f/e3524f6a21e4eff0aa594b32c1e80b9a.jpg'
   },
   {
     id: 'interior',
     title: 'هندسة الديكور والتصميم الداخلي',
+    titleEn: 'Interior Design & Decoration',
     desc: 'صياغة الديكورات الفراغية وتنسيق الخامات والأثاث الداخلي.',
+    descEn: 'Innovating interior decorations, space planning, and materials coordination.',
     bannerImg: 'https://i.pinimg.com/1200x/85/95/cf/8595cfb145c0ad3d82c42e921c0d538f.jpg'
   },
   {
     id: 'facades',
     title: 'التشطيبات الخارجية والواجهات',
+    titleEn: 'Exterior Finishes & Facades',
     desc: 'تصميم وتشطيب الواجهات الخارجية بمواد فاخرة ومقاومة.',
+    descEn: 'Designing and executing premium, weather-resistant external facades.',
     bannerImg: 'https://i.pinimg.com/1200x/db/5f/2c/db5f2cab2963a67cd17905818b43e7fa.jpg'
   },
   {
     id: 'supervision',
     title: 'الإشراف الهندسي وإدارة التنفيذ',
+    titleEn: 'Engineering Supervision & Management',
     desc: 'مراقبة التنفيذ الميداني لضمان مطابقة المخططات والجودة.',
+    descEn: 'Monitoring on-site execution to ensure compliance with drawings and standards.',
     bannerImg: 'https://i.pinimg.com/1200x/a9/c3/63/a9c36330062e9ddde3e681715b5ae957.jpg'
   },
   {
     id: 'marketing',
     title: 'التسويق والاستشارات العقارية',
+    titleEn: 'Real Estate Marketing & Consulting',
     desc: 'تسويق استثماري عقاري وعروض هندسية متطورة لبيع الوحدات.',
+    descEn: 'Strategic real estate marketing and advanced presentations to sell properties.',
     bannerImg: 'https://i.pinimg.com/736x/7c/bd/b1/7cbdb1eff3c79cb0ef1116b20d3c7084.jpg'
   }
 ];

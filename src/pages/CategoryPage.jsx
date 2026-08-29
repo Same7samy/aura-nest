@@ -4,9 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Trash2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { getProjects, fetchProjectsFromSupabase, getCategories, fetchCategoriesFromSupabase } from '../utils/projectData';
 import ContactForm from '../components/ContactForm';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function CategoryPage() {
   const { id } = useParams();
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const [projects, setProjects] = useState(getProjects());
   const [categories, setCategories] = useState(getCategories());
   const [activeUploadProject, setActiveUploadProject] = useState(null);
@@ -17,6 +23,9 @@ export default function CategoryPage() {
   const categoryObj = categories.find(c => (c.id || '').trim() === decodedId) || {};
   const categoryTitle = (categoryObj.title || '').trim();
   const categoryDesc = categoryObj.desc || '';
+
+  const catTitleTrans = (!isRtl && categoryObj.titleEn) ? categoryObj.titleEn : categoryTitle;
+  const catDescTrans = (!isRtl && categoryObj.descEn) ? categoryObj.descEn : categoryDesc;
 
   useEffect(() => {
     setCategories(getCategories());
@@ -92,7 +101,7 @@ export default function CategoryPage() {
     || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80';
 
   return (
-    <div style={{ backgroundColor: 'var(--ivory)' }}>
+    <div style={{ backgroundColor: 'var(--ivory)', direction: isRtl ? 'rtl' : 'ltr' }}>
       {/* Luxury Category Banner */}
       <div
         style={{
@@ -122,13 +131,13 @@ export default function CategoryPage() {
         />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 1.5rem' }}>
           <span style={{ color: 'var(--primary-gold)', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '2px', display: 'block', marginBottom: '0.5rem' }}>
-            القطاع الهندسي
+            {t.categoryTitleTag}
           </span>
           <h1 style={{ color: 'var(--white)', fontSize: '2.2rem', fontWeight: 800, fontFamily: 'var(--font-arabic)', margin: 0 }}>
-            {categoryTitle}
+            {catTitleTrans}
           </h1>
           <p style={{ color: 'var(--light-beige)', opacity: 0.8, fontSize: '0.95rem', marginTop: '0.5rem', maxWidth: '600px', margin: '0.5rem auto 0 auto' }}>
-            {categoryDesc}
+            {catDescTrans}
           </p>
         </div>
       </div>
@@ -137,106 +146,109 @@ export default function CategoryPage() {
         <div className="container">
           {categoryProjects.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '5rem 0', backgroundColor: 'var(--white)', borderRadius: '6px', border: '1px solid var(--light-beige)' }}>
-              <p style={{ fontSize: '1.1rem', color: 'var(--text-gray)' }}>لم يتم رفع أي مشاريع في هذا القطاع بعد.</p>
+              <p style={{ fontSize: '1.1rem', color: 'var(--text-gray)', fontFamily: 'var(--font-arabic)' }}>{t.categoryNoProjects}</p>
             </div>
           ) : (
             <div className="projects-grid">
-              {categoryProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className="card project-item-card"
-                  style={{
-                    padding: 0,
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: 'var(--white)',
-                    borderRadius: '6px',
-                    border: '1px solid var(--light-beige)',
-                    position: 'relative',
-                    transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
-                  }}
-                >
-                  <div style={{ position: 'relative', height: '220px', width: '100%', overflow: 'hidden' }}>
-                    <img
-                      src={project.customImg || project.defaultImg}
-                      alt={project.title}
-                      className="project-img"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 0.4s ease'
-                      }}
-                    />
-                    
-                    {/* Dynamic Badges float style updated */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '12px',
-                        right: '12px',
-                        backgroundColor: 'rgba(63, 64, 66, 0.85)',
-                        backdropFilter: 'blur(4px)',
-                        color: 'var(--primary-gold)',
-                        padding: '0.35rem 0.85rem',
-                        borderRadius: '4px',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        border: '1px solid rgba(161, 154, 140, 0.3)',
-                        fontFamily: 'var(--font-arabic)',
-                        zIndex: 3
-                      }}
-                    >
-                      AURA NEST {project.badgeText}
-                    </div>
-                  </div>
+              {categoryProjects.map((project) => {
+                const projTitle = (!isRtl && project.titleEn) ? project.titleEn : project.title;
+                const projDesc = (!isRtl && project.descEn) ? project.descEn : (project.desc || '');
 
+                return (
                   <div
+                    key={project.id}
+                    className="card project-item-card"
                     style={{
-                      padding: '1.75rem 1.5rem',
+                      padding: 0,
+                      overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '0.65rem',
-                      flexGrow: 1,
-                      textAlign: 'right'
+                      backgroundColor: 'var(--white)',
+                      borderRadius: '6px',
+                      border: '1px solid var(--light-beige)',
+                      position: 'relative',
+                      transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
                     }}
                   >
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--dark-charcoal)', margin: 0 }}>
-                      {project.title}
-                    </h3>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: 1.6, margin: 0, flexGrow: 1 }}>
-                      {project.desc.substring(0, 100)}...
-                    </p>
-
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <Link
-                        to={`/project/${project.id}`}
-                        className="btn btn-primary"
+                    <div style={{ position: 'relative', height: '220px', width: '100%', overflow: 'hidden' }}>
+                      <img
+                        src={project.customImg || project.defaultImg}
+                        alt={projTitle}
+                        className="project-img"
                         style={{
                           width: '100%',
-                          padding: '0.65rem',
-                          fontSize: '0.88rem',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.4s ease'
+                        }}
+                      />
+                      
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: isRtl ? '12px' : 'auto',
+                          left: isRtl ? 'auto' : '12px',
+                          backgroundColor: 'rgba(63, 64, 66, 0.85)',
+                          backdropFilter: 'blur(4px)',
+                          color: 'var(--primary-gold)',
+                          padding: '0.35rem 0.85rem',
                           borderRadius: '4px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          textDecoration: 'none'
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          border: '1px solid rgba(161, 154, 140, 0.3)',
+                          fontFamily: 'var(--font-arabic)',
+                          zIndex: 3
                         }}
                       >
-                        تفاصيل المشروع
-                      </Link>
+                        AURA NEST {isRtl ? 'تميز' : 'Excellence'}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        padding: '1.75rem 1.5rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.65rem',
+                        flexGrow: 1,
+                        textAlign: isRtl ? 'right' : 'left'
+                      }}
+                    >
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--dark-charcoal)', margin: 0 }}>
+                        {projTitle}
+                      </h3>
+                      <p style={{ fontSize: '0.88rem', color: 'var(--text-gray)', lineHeight: 1.6, margin: 0, flexGrow: 1 }}>
+                        {projDesc.length > 100 ? `${projDesc.substring(0, 100)}...` : projDesc}
+                      </p>
+
+                      <div style={{ marginTop: '0.75rem' }}>
+                        <Link
+                          to={`/project/${project.id}`}
+                          className="btn btn-primary"
+                          style={{
+                            width: '100%',
+                            padding: '0.65rem',
+                            fontSize: '0.88rem',
+                            borderRadius: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          {t.portfolioDetails}
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       </section>
-
 
       <ContactForm />
     </div>

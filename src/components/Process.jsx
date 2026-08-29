@@ -1,9 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Compass, FileText, Hammer, Paintbrush, ShieldCheck, Building } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function Process() {
-  const steps = [
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
+  const stepsAr = [
     {
       number: '01',
       icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
@@ -48,13 +54,64 @@ export default function Process() {
     }
   ];
 
+  const stepsEn = [
+    {
+      number: '01',
+      icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Land & Site Selection',
+      desc: 'Studying and selecting the ideal land, evaluating its location from investment and geographic aspects to ensure suitability.'
+    },
+    {
+      number: '02',
+      icon: <Compass size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Architectural & Structural Designs',
+      desc: 'Formulating creative engineering and detailed structural designs meeting aesthetic criteria while ensuring maximum durability.'
+    },
+    {
+      number: '03',
+      icon: <FileText size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Permits & Approvals Acquisition',
+      desc: 'Completing government procedures, acquiring construction permits and necessary approvals from relevant authorities to start legally.'
+    },
+    {
+      number: '04',
+      icon: <Hammer size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Compliant Execution & Construction',
+      desc: 'Launching construction and concrete structures with strict precision, conforming fully to approved licenses and drawings.'
+    },
+    {
+      number: '05',
+      icon: <Paintbrush size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Premium & Elite Finishing',
+      desc: 'Executing luxury interior and exterior finishes, installing state-of-the-art fixtures and systems under supreme standards.'
+    },
+    {
+      number: '06',
+      icon: <ShieldCheck size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Inspection & Final Handover',
+      desc: 'Conducting engineering tests, checking finishing quality, and auditing systems completely before final key handover.'
+    },
+    {
+      number: '07',
+      icon: <Building size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Real Estate Marketing & Exit',
+      desc: 'Preparing innovative showcase strategies and marketing project units to ensure a successful and rapid investment exit.'
+    }
+  ];
+
+  const steps = isRtl ? stepsAr : stepsEn;
+
   return (
     <section id="process" className="section-padding" style={{ backgroundColor: 'var(--light-beige)', position: 'relative', overflow: 'hidden' }}>
       <div className="container">
         {/* Section title */}
-        <div className="section-title-wrapper" style={{ textAlign: 'right', marginBottom: '4rem' }}>
-          <span className="section-subtitle" style={{ right: 0, left: 'auto', transform: 'none' }}>كيف نعمل</span>
-          <h2 className="section-main-title">رحلة التحول: من المفهوم إلى الواقع</h2>
+        <div className="section-title-wrapper" style={{ textAlign: isRtl ? 'right' : 'left', marginBottom: '4rem' }}>
+          <span className="section-subtitle" style={{ right: isRtl ? 0 : 'auto', left: isRtl ? 'auto' : 0, transform: 'none' }}>
+            {isRtl ? 'كيف نعمل' : 'Our Process'}
+          </span>
+          <h2 className="section-main-title">
+            {isRtl ? 'رحلة التحول: من المفهوم إلى الواقع' : 'The Journey: From Concept to Reality'}
+          </h2>
         </div>
 
         {/* Steps Grid */}
@@ -83,16 +140,17 @@ export default function Process() {
                 padding: '2.5rem 2rem',
                 borderRadius: '8px',
                 boxShadow: 'var(--shadow-sm)',
-                borderRight: '4px solid var(--primary-gold)',
+                borderRight: isRtl ? '4px solid var(--primary-gold)' : 'none',
+                borderLeft: isRtl ? 'none' : '4px solid var(--primary-gold)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1.25rem',
-                textAlign: 'right',
+                textAlign: isRtl ? 'right' : 'left',
                 transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
               }}
             >
               {/* Header: Icon, Number */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row' : 'row' }}>
                 {/* Icon Container */}
                 <div
                   style={{
@@ -123,12 +181,12 @@ export default function Process() {
                 </span>
               </div>
 
-              {/* Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {/* Text content details */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <h3
                   style={{
                     fontSize: '1.25rem',
-                    fontWeight: 700,
+                    fontWeight: 750,
                     color: 'var(--dark-charcoal)'
                   }}
                 >
@@ -149,30 +207,6 @@ export default function Process() {
           ))}
         </div>
       </div>
-
-      <style>{`
-        @media (min-width: 992px) {
-          .process-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .process-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg) !important;
-            border-right-color: var(--primary-gold) !important;
-          }
-          .process-card:nth-child(7) {
-            grid-column: span 3;
-          }
-        }
-        @media (min-width: 768px) and (max-width: 991px) {
-          .process-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .process-card:nth-child(7) {
-            grid-column: span 2;
-          }
-        }
-      `}</style>
     </section>
   );
 }

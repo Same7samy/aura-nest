@@ -11,32 +11,38 @@ import {
   Compass,
   Coins
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function AboutUs() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const aboutSections = [
     {
-      title: 'هويتنا',
+      title: t.aboutIdentity,
       icon: <Building2 size={22} style={{ color: 'var(--primary-gold)' }} />,
-      desc: 'كيان هندسي واستشاري يجمع بين سحر التصميم الإبداعي ودقة التنفيذ الفني، ليحوّل الفكرة إلى فراغ متكامل يعكس رقي أصحابه.'
+      desc: t.aboutIdentityDesc
     },
     {
-      title: 'رؤيتنا',
+      title: t.aboutVision,
       icon: <Eye size={22} style={{ color: 'var(--primary-gold)' }} />,
-      desc: 'ريادة قطاع التطوير المعماري عبر ابتكار مساحات ذكية ومستدامة، ترفع القيمة الاستثمارية لعملائنا وتصنع ملامح المستقبل.'
+      desc: t.aboutVisionDesc
     },
     {
-      title: 'رسالتنا',
+      title: t.aboutMission,
       icon: <Target size={22} style={{ color: 'var(--primary-gold)' }} />,
-      desc: 'مرافقة العميل في كل مرحلة من مراحل مشروعه، بالتزام مطلق بالشفافية ودقة في إدارة التكلفة والوقت، لتحقيق أعلى معايير الجودة.'
+      desc: t.aboutMissionDesc
     },
     {
-      title: 'قيمنا',
+      title: t.aboutValues,
       icon: <Award size={22} style={{ color: 'var(--primary-gold)' }} />,
-      desc: 'نزاهة مهنية كاملة وإتقان لا يساوم على معايير الأمان، لنُنجز فراغات استثنائية مبنية لتدوم وتُخلّد هوية أصحابها.'
+      desc: t.aboutValuesDesc
     }
   ];
 
-  const pillars = [
+  const pillarsAr = [
     {
       number: '01',
       icon: <Award size={24} style={{ color: 'var(--primary-gold)' }} />,
@@ -69,6 +75,41 @@ export default function AboutUs() {
     }
   ];
 
+  const pillarsEn = [
+    {
+      number: '01',
+      icon: <Award size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Standards Exceeding the Ordinary',
+      desc: 'We subject every architectural and structural detail to rigorous engineering checks beyond standard codes to ensure sustainability.'
+    },
+    {
+      number: '02',
+      icon: <Coins size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Smart Cost & Materials Management',
+      desc: 'We help you lower project costs by selecting optimal materials, analyzing alternatives, and sourcing best rates while reducing wastage.'
+    },
+    {
+      number: '03',
+      icon: <Users size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Multidisciplinary Consulting Team',
+      desc: 'Consulting engineers, interior designers, and project managers working in perfect harmony to realize a unified vision.'
+    },
+    {
+      number: '04',
+      icon: <ShieldCheck size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Strict Schedule & Budget Compliance',
+      desc: 'Controlled engineering management guarantees project handovers on schedule without any increase in agreed costs.'
+    },
+    {
+      number: '05',
+      icon: <HeartHandshake size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'Extended Partnership & Post-Delivery Support',
+      desc: 'Engineering consultations and periodic maintenance to preserve the value of your architectural investment long-term.'
+    }
+  ];
+
+  const pillars = isRtl ? pillarsAr : pillarsEn;
+
   return (
     <section id="about" className="section-padding" style={{ backgroundColor: 'var(--ivory)', position: 'relative', overflow: 'hidden' }}>
       
@@ -77,7 +118,8 @@ export default function AboutUs() {
         style={{
           position: 'absolute',
           top: '-10%',
-          right: '-5%',
+          right: isRtl ? '-5%' : 'auto',
+          left: isRtl ? 'auto' : '-5%',
           width: '500px',
           height: '500px',
           background: 'radial-gradient(circle, rgba(161, 154, 140, 0.08) 0%, rgba(246, 244, 238, 0) 70%)',
@@ -90,7 +132,8 @@ export default function AboutUs() {
         style={{
           position: 'absolute',
           bottom: '-10%',
-          left: '-5%',
+          left: isRtl ? '-5%' : 'auto',
+          right: isRtl ? 'auto' : '-5%',
           width: '600px',
           height: '600px',
           background: 'radial-gradient(circle, rgba(63, 64, 66, 0.05) 0%, rgba(246, 244, 238, 0) 70%)',
@@ -102,10 +145,14 @@ export default function AboutUs() {
 
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         
-        {/* Section title (Standard like others) */}
-        <div className="section-title-wrapper" style={{ textAlign: 'right', marginBottom: '4rem' }}>
-          <span className="section-subtitle" style={{ right: 0, left: 'auto', transform: 'none' }}>من نحن</span>
-          <h2 className="section-main-title">هوية تُبنى بالتفاصيل وتكتمل بالإتقان الهندسي</h2>
+        {/* Section title */}
+        <div className="section-title-wrapper" style={{ textAlign: isRtl ? 'right' : 'left', marginBottom: '4rem' }}>
+          <span className="section-subtitle" style={{ right: isRtl ? 0 : 'auto', left: isRtl ? 'auto' : 0, transform: 'none' }}>{t.navAbout}</span>
+          <h2 className="section-main-title">
+            {isRtl 
+              ? 'هوية تُبنى بالتفاصيل وتكتمل بالإتقان الهندسي' 
+              : 'Identity Built on Details, Completed with Engineering Excellence'}
+          </h2>
         </div>
 
         {/* Main Showcase Grid */}
@@ -120,18 +167,26 @@ export default function AboutUs() {
           className="about-top-grid"
         >
           
-          {/* Brand Philosophy and 2x2 Pillar Highlights */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', textAlign: 'right' }}>
+          {/* Brand Philosophy */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', textAlign: isRtl ? 'right' : 'left' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--dark-charcoal)' }}>
-                منظومة معمارية وهندسية متكاملة تصنع الفارق
+                {isRtl ? 'منظومة معمارية وهندسية متكاملة تصنع الفارق' : 'An Integrated Architectural & Engineering System'}
               </h3>
               <p style={{ fontSize: '1.05rem', color: 'var(--text-gray)', lineHeight: '1.8' }}>
-                وُلدت <strong>AURA NEST</strong> لتكون الشريك الاستراتيجي في تحويل مساحات الأحلام إلى واقع ملموس. نحن لا نبني جدراناً، بل نُشكّل بيئات فراغية راقية تجمع بين التطور المعماري والابتكار التصميمي والانضباط الهندسي الصارم.
+                {isRtl ? (
+                  <>
+                    وُلدت <strong>AURA NEST</strong> لتكون الشريك الاستراتيجي في تحويل مساحات الأحلام إلى واقع ملموس. نحن لا نبني جدراناً، بل نُشكّل بيئات فراغية راقية تجمع بين التطور المعماري والابتكار التصميمي والانضباط الهندسي الصارم.
+                  </>
+                ) : (
+                  <>
+                    <strong>AURA NEST</strong> was born to be the strategic partner in transforming dream spaces into a tangible reality. We do not just build walls; we shape sophisticated spatial environments combining architectural advancement, design innovation, and strict engineering discipline.
+                  </>
+                )}
               </p>
             </div>
 
-            {/* 2x2 Pillars Grid instead of tabs */}
+            {/* 2x2 Pillars Grid */}
             <div 
               style={{
                 display: 'grid',
@@ -151,7 +206,8 @@ export default function AboutUs() {
                   style={{
                     display: 'flex',
                     alignItems: 'start',
-                    gap: '1.25rem'
+                    gap: '1.25rem',
+                    flexDirection: isRtl ? 'row' : 'row'
                   }}
                 >
                   <div
@@ -168,7 +224,7 @@ export default function AboutUs() {
                   >
                     {sec.icon}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', textAlign: isRtl ? 'right' : 'left' }}>
                     <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--dark-charcoal)' }}>
                       {sec.title}
                     </h4>
@@ -189,7 +245,6 @@ export default function AboutUs() {
             viewport={{ once: true, amount: 0.05 }}
             style={{ position: 'relative', width: '100%' }}
           >
-            {/* Image Box */}
             <div 
               style={{
                 position: 'relative',
@@ -207,13 +262,11 @@ export default function AboutUs() {
                   width: '100%',
                   height: '460px',
                   objectFit: 'cover',
-                  display: 'block',
-                  transition: 'transform 0.7s ease'
+                  display: 'block'
                 }}
                 className="about-interactive-img"
               />
               
-              {/* Luxury Gradient Overlay at Bottom */}
               <div 
                 style={{
                   position: 'absolute',
@@ -234,12 +287,13 @@ export default function AboutUs() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   gap: '1rem',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  flexDirection: isRtl ? 'row' : 'row-reverse'
                 }}
               >
-                <div>
+                <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
                   <span style={{ color: 'var(--primary-gold)', fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
-                    استوديو الهندسة والتصميم
+                    {isRtl ? 'استوديو الهندسة والتصميم' : 'Engineering & Design Studio'}
                   </span>
                   <h4 style={{ color: 'var(--white)', fontSize: '1.25rem', fontWeight: 700 }}>
                     Aura Nest Architecture
@@ -257,21 +311,22 @@ export default function AboutUs() {
                     fontWeight: 600
                   }}
                 >
-                  معايير هندسية عالمية
+                  {isRtl ? 'معايير هندسية عالمية' : 'Global Engineering Standards'}
                 </div>
               </div>
             </div>
 
-            {/* Floating Glass Badge Top Right */}
+            {/* Floating Glass Badge */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
               style={{
                 position: 'absolute',
                 top: '-15px',
-                right: '-15px',
+                right: isRtl ? '-15px' : 'auto',
+                left: isRtl ? 'auto' : '-15px',
                 backgroundColor: 'var(--white)',
                 padding: '1rem 1.25rem',
                 borderRadius: '10px',
@@ -280,7 +335,8 @@ export default function AboutUs() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.85rem',
-                zIndex: 2
+                zIndex: 2,
+                flexDirection: isRtl ? 'row' : 'row'
               }}
             >
               <div 
@@ -297,12 +353,12 @@ export default function AboutUs() {
               >
                 <Compass size={22} style={{ color: 'var(--primary-gold)' }} />
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)' }}>
                   100%
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-gray)', fontWeight: 600 }}>
-                  دقة في التنفيذ والتسليم
+                  {isRtl ? 'دقة في التنفيذ والتسليم' : 'Precision in Execution & Delivery'}
                 </div>
               </div>
             </motion.div>
@@ -312,8 +368,8 @@ export default function AboutUs() {
               style={{
                 position: 'absolute',
                 top: '20px',
-                left: '20px',
-                right: '-20px',
+                left: isRtl ? '20px' : '-20px',
+                right: isRtl ? '-20px' : '20px',
                 bottom: '-20px',
                 border: '2px solid var(--primary-gold)',
                 borderRadius: '14px',
@@ -327,7 +383,7 @@ export default function AboutUs() {
 
         </div>
 
-        {/* Bottom Section: 5 Distinctive Pillars (ما يميزنا عن غيرنا) */}
+        {/* Bottom Section: 5 Distinctive Pillars */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -336,17 +392,17 @@ export default function AboutUs() {
           style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginTop: '3rem' }}
         >
           {/* Subheading */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--light-beige)', paddingBottom: '1.25rem' }}>
-            <div style={{ textAlign: 'right' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--light-beige)', paddingBottom: '1.25rem', flexDirection: isRtl ? 'row' : 'row-reverse' }}>
+            <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
               <span style={{ fontSize: '0.88rem', color: 'var(--primary-gold)', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>
-                ركائز التفوق
+                {isRtl ? 'ركائز التفوق' : 'Pillars of Excellence'}
               </span>
               <h3 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--dark-charcoal)' }}>
-                لماذا يختار النخبة Aura Nest؟
+                {isRtl ? 'لماذا يختار النخبة Aura Nest؟' : 'Why Does the Elite Choose Aura Nest?'}
               </h3>
             </div>
             <div style={{ fontSize: '0.92rem', color: 'var(--warm-gray)', fontWeight: 600 }} className="hide-on-mobile">
-              الجودة • الدقة • الالتزام
+              {isRtl ? 'الجودة • الدقة • الالتزام' : 'Quality • Precision • Commitment'}
             </div>
           </div>
           
@@ -372,7 +428,7 @@ export default function AboutUs() {
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   gap: '1.2rem',
-                  textAlign: 'right',
+                  textAlign: isRtl ? 'right' : 'left',
                   position: 'relative',
                   overflow: 'hidden',
                   border: '1px solid var(--light-beige)',
@@ -384,7 +440,8 @@ export default function AboutUs() {
                   style={{
                     position: 'absolute',
                     top: '1rem',
-                    left: '1.2rem',
+                    left: isRtl ? '1.2rem' : 'auto',
+                    right: isRtl ? 'auto' : '1.2rem',
                     fontSize: '2.5rem',
                     fontWeight: 900,
                     color: 'rgba(161, 154, 140, 0.12)',
@@ -443,7 +500,6 @@ export default function AboutUs() {
       </div>
       
       <style>{`
-        /* 2-column on desktop for pillars layout */
         @media (min-width: 768px) {
           .about-pillars-grid {
             grid-template-columns: repeat(2, 1fr) !important;

@@ -1,16 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function Hero() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const heroImages = ['/hero1.png', '/hero2.png', '/hero3.png', '/hero4.png', '/hero5.png'];
-  const captions = [
+  const captionsAr = [
     "تصاميم سكنية راقية",
     "تفاصيل تشطيبات مذهلة",
     "تخطيط ودراسة معمارية",
     "فخامة اللمسات المعاصرة",
     "إشراف هندسي متكامل"
   ];
+  const captionsEn = [
+    "Sophisticated Residential Designs",
+    "Stunning Finishing Details",
+    "Architectural Planning & Studies",
+    "Luxury Contemporary Touches",
+    "Integrated Engineering Supervision"
+  ];
+  const captions = isRtl ? captionsAr : captionsEn;
+
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
   useEffect(() => {
@@ -125,7 +140,7 @@ export default function Hero() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: 'right' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: isRtl ? 'right' : 'left' }}
           >
             <motion.h1
               variants={itemVariants}
@@ -136,8 +151,17 @@ export default function Hero() {
                 color: 'var(--dark-charcoal)'
               }}
             >
-              نصنع الخيال معاً… <br />
-              <span className="text-gradient">ونشرف على تحقيقه</span>
+              {isRtl ? (
+                <>
+                  نصنع الخيال معاً… <br />
+                  <span className="text-gradient">ونشرف على تحقيقه</span>
+                </>
+              ) : (
+                <>
+                  We shape imagination… <br />
+                  <span className="text-gradient">And supervise its creation</span>
+                </>
+              )}
             </motion.h1>
 
             <motion.p
@@ -146,10 +170,15 @@ export default function Hero() {
                 fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                 color: 'var(--text-gray)',
                 maxWidth: '600px',
-                lineHeight: 1.7
+                lineHeight: 1.7,
+                marginLeft: isRtl ? '0' : 'unset',
+                marginRight: isRtl ? 'unset' : '0'
               }}
             >
-              منظومة هندسية متكاملة تصيغ المساحات السكنية والتجارية بحلول تشطيبية ومعمارية راقية، نرافقكم فيها من الفكرة الأولى وحتى تسليم المفتاح.
+              {isRtl 
+                ? 'منظومة هندسية متكاملة تصيغ المساحات السكنية والتجارية بحلول تشطيبية ومعمارية راقية، نرافقكم فيها من الفكرة الأولى وحتى تسليم المفتاح.'
+                : 'An integrated engineering system shaping residential and commercial spaces with premium finishes, accompanying you from the first concept to turnkey handover.'
+              }
             </motion.p>
 
             <motion.div
@@ -161,7 +190,8 @@ export default function Hero() {
                 gap: '0.75rem',
                 marginTop: '0.5rem',
                 width: '100%',
-                maxWidth: '500px'
+                maxWidth: '500px',
+                justifyContent: isRtl ? 'flex-start' : 'flex-start'
               }}
             >
               <a
@@ -177,8 +207,8 @@ export default function Hero() {
                   justifyContent: 'center'
                 }}
               >
-                <MessageSquare size={17} style={{ marginLeft: '0.35rem' }} />
-                تواصل واتساب
+                <MessageSquare size={17} style={{ marginLeft: isRtl ? '0.35rem' : '0', marginRight: isRtl ? '0' : '0.35rem' }} />
+                {isRtl ? 'تواصل واتساب' : 'WhatsApp Contact'}
               </a>
               <button
                 onClick={() => handleScrollTo('services')}
@@ -191,8 +221,15 @@ export default function Hero() {
                   justifyContent: 'center'
                 }}
               >
-                استكشف خدماتنا
-                <ArrowLeft size={17} style={{ marginRight: '0.35rem' }} />
+                <span>{isRtl ? 'استكشف خدماتنا' : 'Explore Services'}</span>
+                <ArrowLeft 
+                  size={17} 
+                  style={{ 
+                    marginRight: isRtl ? '0.35rem' : '0', 
+                    marginLeft: isRtl ? '0' : '0.35rem',
+                    transform: isRtl ? 'none' : 'rotate(180deg)'
+                  }} 
+                />
               </button>
             </motion.div>
           </motion.div>
