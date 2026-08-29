@@ -207,6 +207,31 @@ export default function Process() {
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 992px) {
+          .process-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .process-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg) !important;
+            border-right-color: var(--primary-gold) !important;
+            border-left-color: var(--primary-gold) !important;
+          }
+          .process-card:nth-child(7) {
+            grid-column: span 3;
+          }
+        }
+        @media (min-width: 768px) and (max-width: 991px) {
+          .process-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .process-card:nth-child(7) {
+            grid-column: span 2;
+          }
+        }
+      `}</style>
     </section>
   );
 }
