@@ -9,6 +9,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  if (location.pathname === '/control') {
+    return null;
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;

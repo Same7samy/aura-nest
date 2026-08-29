@@ -207,7 +207,7 @@ export default function AdminPanel() {
   // Password Lock view
   if (!isAuthenticated) {
     return (
-      <div style={{ minHeight: '90vh', backgroundColor: 'var(--ivory)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', paddingTop: '120px' }}>
+      <div style={{ minHeight: '90vh', backgroundColor: 'var(--ivory)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', paddingTop: '2rem' }}>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,7 +246,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', paddingTop: '100px', paddingBottom: '5rem' }}>
+    <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', paddingTop: '4rem', paddingBottom: '5rem' }}>
       
       {/* Alert Component */}
       <AnimatePresence>

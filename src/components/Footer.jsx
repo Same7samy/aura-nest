@@ -5,6 +5,13 @@ import { Phone, MapPin, Heart, Mail } from 'lucide-react';
 import { getContactInfo, fetchContactInfoFromSupabase } from '../utils/projectData';
 
 export default function Footer() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === '/control') {
+    return null;
+  }
+
   const [contactData, setContactData] = useState(getContactInfo());
 
   useEffect(() => {
@@ -14,8 +21,6 @@ export default function Footer() {
   }, []);
 
   const currentYear = new Date().getFullYear();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleScrollTo = (id) => {
     if (location.pathname !== '/') {
