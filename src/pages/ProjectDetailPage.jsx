@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Calendar, MapPin, ShieldCheck, MessageSquare } from 'lucide-react';
+import { Clock, Calendar, MapPin, ShieldCheck, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getProjects, fetchProjectsFromSupabase } from '../utils/projectData';
 import ContactForm from '../components/ContactForm';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const [projects, setProjects] = useState(getProjects());
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
     setProjects(getProjects());
     fetchProjectsFromSupabase().then(dbProjs => {
@@ -16,6 +18,7 @@ export default function ProjectDetailPage() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    setCurrentSlide(0);
   }, [id]);
 
   const project = projects.find(p => p.id === parseInt(id)) || {};
@@ -37,6 +40,15 @@ export default function ProjectDetailPage() {
   }
 
   const projectImg = project.customImg || project.defaultImg;
+  const allImages = [projectImg, ...(project.gallery || [])].filter(Boolean);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   return (
     <div style={{ backgroundColor: 'var(--ivory)' }}>
@@ -85,41 +97,169 @@ export default function ProjectDetailPage() {
           <div className="project-detail-grid">
             {/* Visual Column - Right Column in RTL */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ position: 'relative', width: '100%', height: '460px', overflow: 'hidden', borderRadius: '8px', boxShadow: 'var(--shadow-md)' }}>
-                <img
-                  src={projectImg}
-                  alt={project.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+              
+              {/* Slider Container */}
+              <div 
+                style={{ 
+                  position: 'relative', 
+                  width: '100%', 
+                  height: '460px', 
+                  overflow: 'hidden', 
+                  borderRadius: '8px', 
+                  boxShadow: 'var(--shadow-md)',
+                  backgroundColor: 'var(--dark-charcoal)'
+                }}
+              >
+                {/* Slides Wrapper */}
+                <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                  <img
+                    src={allImages[currentSlide]}
+                    alt={`${project.title} slide ${currentSlide + 1}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.5s ease-in-out' }}
+                  />
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '80px',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Arrow Buttons (Only if multiple images exist) */}
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={nextSlide}
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        right: '16px',
+                        transform: 'translateY(-50%)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        border: '1px solid rgba(63, 64, 66, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--dark-charcoal)',
+                        cursor: 'pointer',
+                        boxShadow: 'var(--shadow-md)',
+                        zIndex: 10,
+                        transition: 'all 0.25s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--primary-gold)';
+                        e.currentTarget.style.color = '#fff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+                        e.currentTarget.style.color = 'var(--dark-charcoal)';
+                      }}
+                    >
+                      <ChevronRight size={22} />
+                    </button>
+
+                    <button
+                      onClick={prevSlide}
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '16px',
+                        transform: 'translateY(-50%)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        border: '1px solid rgba(63, 64, 66, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--dark-charcoal)',
+                        cursor: 'pointer',
+                        boxShadow: 'var(--shadow-md)',
+                        zIndex: 10,
+                        transition: 'all 0.25s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--primary-gold)';
+                        e.currentTarget.style.color = '#fff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+                        e.currentTarget.style.color = 'var(--dark-charcoal)';
+                      }}
+                    >
+                      <ChevronLeft size={22} />
+                    </button>
+                  </>
+                )}
+
+                {/* Dot indicators at the bottom */}
+                {allImages.length > 1 && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: '16px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      display: 'flex',
+                      gap: '0.5rem',
+                      zIndex: 10
+                    }}
+                  >
+                    {allImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentSlide(idx)}
+                        style={{
+                          width: currentSlide === idx ? '24px' : '8px',
+                          height: '8px',
+                          borderRadius: '4px',
+                          backgroundColor: currentSlide === idx ? 'var(--primary-gold)' : 'rgba(255, 255, 255, 0.6)',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Gallery Images Grid */}
-              {project.gallery && project.gallery.length > 0 && (
+              {/* Thumbnails Grid at Bottom */}
+              {allImages.length > 1 && (
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--dark-charcoal)', marginBottom: '0.75rem', textAlign: 'right' }}>
-                    معرض الصور الكامل للمشروع
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--dark-charcoal)', marginBottom: '0.65rem', textAlign: 'right' }}>
+                    تصفح صور المشروع ({allImages.length})
                   </h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
-                    {project.gallery.map((img, idx) => (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.6rem' }}>
+                    {allImages.map((img, idx) => (
                       <div 
                         key={idx} 
+                        onClick={() => setCurrentSlide(idx)}
                         style={{ 
-                          height: '90px', 
-                          borderRadius: '6px', 
+                          height: '60px', 
+                          borderRadius: '4px', 
                           overflow: 'hidden', 
                           boxShadow: 'var(--shadow-sm)', 
-                          border: '1px solid var(--light-beige)'
+                          border: currentSlide === idx ? '2.5px solid var(--primary-gold)' : '1px solid var(--light-beige)',
+                          cursor: 'pointer',
+                          opacity: currentSlide === idx ? 1 : 0.7,
+                          transition: 'all 0.2s'
                         }}
                       >
-                        <a href={img} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
-                          <img 
-                            src={img} 
-                            alt={`${project.title} gallery ${idx + 1}`} 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.06)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                          />
-                        </a>
+                        <img 
+                          src={img} 
+                          alt={`${project.title} thumb ${idx + 1}`} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                       </div>
                     ))}
                   </div>
@@ -228,7 +368,6 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </section>
-
 
       <ContactForm />
     </div>
