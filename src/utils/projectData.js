@@ -10,7 +10,12 @@ export const INITIAL_PROJECTS = [
     year: '2025',
     location: 'التجمع الخامس، القاهرة الجديدة',
     materials: 'رخام طبيعي، خشب أرو، إضاءة مخفية ذكية',
-    defaultImg: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80'
+    defaultImg: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80'
+    ]
   },
   {
     id: 2,
@@ -36,7 +41,11 @@ export const INITIAL_PROJECTS = [
     year: '2025',
     location: 'التجمع الخامس، القاهرة',
     materials: 'دهانات قطيفة، جبس بورد، خشب بديل رخام',
-    defaultImg: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'
+    defaultImg: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1617806118233-18e1db207f62?auto=format&fit=crop&w=800&q=80'
+    ]
   },
   {
     id: 4,
@@ -161,7 +170,20 @@ export const DEFAULT_CONTACT = {
 };
 
 // Initialize localStorage values if not already present
-if (!localStorage.getItem(PROJECTS_KEY)) {
+const savedProjects = localStorage.getItem(PROJECTS_KEY);
+let needsReset = false;
+if (savedProjects) {
+  try {
+    const parsed = JSON.parse(savedProjects);
+    if (parsed.length > 0 && !parsed[0].gallery) {
+      needsReset = true;
+    }
+  } catch (e) {
+    needsReset = true;
+  }
+}
+
+if (!savedProjects || needsReset) {
   safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(INITIAL_PROJECTS));
 }
 if (!localStorage.getItem(CATEGORIES_KEY)) {
