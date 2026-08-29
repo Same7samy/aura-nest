@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Clock, Send } from 'lucide-react';
+import { MapPin, Phone, Clock, Send, Mail } from 'lucide-react';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -63,6 +63,12 @@ export default function ContactForm() {
       title: 'الهاتف / واتساب',
       desc: '01111 014 008',
       link: 'tel:01111014008'
+    },
+    {
+      icon: <Mail size={24} style={{ color: 'var(--primary-gold)' }} />,
+      title: 'البريد الإلكتروني',
+      desc: 'info@aura-nest.net',
+      link: 'mailto:info@aura-nest.net'
     },
     {
       icon: <Clock size={24} style={{ color: 'var(--primary-gold)' }} />,

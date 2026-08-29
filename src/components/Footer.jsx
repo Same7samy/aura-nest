@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
-import { Phone, MapPin, Heart } from 'lucide-react';
+import { Phone, MapPin, Heart, Mail } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -167,6 +167,22 @@ export default function Footer() {
                   01111 014 008
                 </a>
               </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <Mail size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0 }} />
+                <a
+                  href="mailto:info@aura-nest.net"
+                  style={{
+                    fontSize: '0.92rem',
+                    color: 'var(--light-beige)',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    transition: 'color var(--transition-fast)'
+                  }}
+                  className="footer-email-link"
+                >
+                  info@aura-nest.net
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -199,7 +215,8 @@ export default function Footer() {
           color: var(--primary-gold) !important;
           transform: translateX(-4px);
         }
-        .footer-phone-link:hover {
+        .footer-phone-link:hover,
+        .footer-email-link:hover {
           color: var(--primary-gold) !important;
         }
         @media (min-width: 768px) {
