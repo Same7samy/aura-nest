@@ -90,7 +90,7 @@ Contact Info:
     {
       icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'العنوان' : 'Address',
-      desc: contactData.address
+      desc: (!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address
     },
     {
       icon: <Phone size={24} style={{ color: 'var(--primary-gold)' }} />,
@@ -107,7 +107,7 @@ Contact Info:
     {
       icon: <Clock size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'ساعات العمل' : 'Working Hours',
-      desc: contactData.hours
+      desc: (!isRtl && contactData.hoursEn) ? contactData.hoursEn : contactData.hours
     }
   ];
 

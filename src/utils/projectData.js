@@ -171,11 +171,13 @@ function safeSetLocalStorage(key, value) {
 // Default contact info
 export const DEFAULT_CONTACT = {
   address: 'التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني',
+  addressEn: 'Second District, Myrna Mall, Second Floor, Fifth Settlement, New Cairo',
   phone: '01111 014 008',
   phoneLink: 'tel:01111014008',
   email: 'info@aura-nest.net',
   emailLink: 'mailto:info@aura-nest.net',
   hours: '١٠ ص — ٨ م (يومياً عدا الجمعة)',
+  hoursEn: '10 AM — 8 PM (Daily except Friday)',
   whatsapp: '201111014008',
   facebook: 'https://www.facebook.com/share/1Q51A4NmPs/',
   instagram: 'https://instagram.com/'

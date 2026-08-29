@@ -186,7 +186,7 @@ export default function Footer() {
               <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                 <MapPin size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
                 <span style={{ fontSize: '0.92rem', color: 'var(--light-beige)', lineHeight: '1.5' }}>
-                  {contactData.address}
+                  {(!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address}
                 </span>
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

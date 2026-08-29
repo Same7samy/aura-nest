@@ -299,11 +299,13 @@ export default function AdminPanel() {
     const formData = new FormData(e.target);
     const info = {
       address: formData.get('address'),
+      addressEn: formData.get('addressEn'),
       phone: formData.get('phone'),
       phoneLink: `tel:${formData.get('phone').replace(/\s+/g, '')}`,
       email: formData.get('email'),
       emailLink: `mailto:${formData.get('email')}`,
       hours: formData.get('hours'),
+      hoursEn: formData.get('hoursEn'),
       whatsapp: formData.get('whatsapp'),
       facebook: formData.get('facebook'),
       instagram: formData.get('instagram')
@@ -761,13 +763,57 @@ export default function AdminPanel() {
                 
                 <form onSubmit={handleContactSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="contact-admin-form">
                   <div className="form-group" style={{ margin: 0 }}>
-                    <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>العنوان الفعلي (المقر الرئيسي)</label>
+                    <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>العنوان الفعلي (المقر الرئيسي) بالعربية</label>
                     <input 
                       type="text" 
+                      id="contact_address_ar"
                       name="address" 
                       className="form-control" 
                       defaultValue={contactData.address || ''} 
                       placeholder="مثال: التجمع الخامس - الحي الثاني..."
+                      style={{ fontFamily: 'var(--font-arabic)' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>العنوان الفعلي بالإنجليزية (Address EN)</label>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const arAddr = document.getElementById('contact_address_ar')?.value;
+                          if (!arAddr || !arAddr.trim()) {
+                            showAlert('يرجى كتابة العنوان بالعربية أولاً ليتم ترجمته', 'error');
+                            return;
+                          }
+                          setLoading(true);
+                          try {
+                            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(arAddr)}&langpair=ar|en`);
+                            const data = await res.json();
+                            if (data && data.responseData && data.responseData.translatedText) {
+                              const trans = data.responseData.translatedText;
+                              document.getElementById('contact_address_en').value = trans;
+                            } else {
+                              showAlert('فشلت الترجمة التلقائية، يرجى تعبئته يدوياً', 'error');
+                            }
+                          } catch (e) {
+                            showAlert('حدث خطأ أثناء الترجمة', 'error');
+                          }
+                          setLoading(false);
+                        }}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                      >
+                        <Languages size={13} />
+                        <span>ترجمة تلقائية</span>
+                      </button>
+                    </div>
+                    <input 
+                      type="text" 
+                      id="contact_address_en"
+                      name="addressEn" 
+                      className="form-control" 
+                      defaultValue={contactData.addressEn || ''} 
+                      placeholder="e.g. Fifth Settlement, New Cairo"
                       style={{ fontFamily: 'var(--font-arabic)' }}
                     />
                   </div>
@@ -832,14 +878,58 @@ export default function AdminPanel() {
                     />
                   </div>
 
-                  <div className="form-group" style={{ margin: 0, gridColumn: 'span 2' }}>
-                    <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>ساعات وأيام العمل الرسمية</label>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem' }}>ساعات وأيام العمل الرسمية بالعربية</label>
                     <input 
                       type="text" 
+                      id="contact_hours_ar"
                       name="hours" 
                       className="form-control" 
                       defaultValue={contactData.hours || ''} 
                       placeholder="مثال: ١٠ ص — ٨ م (يومياً عدا الجمعة)"
+                      style={{ fontFamily: 'var(--font-arabic)' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <label className="form-label" style={{ fontFamily: 'var(--font-arabic)', fontSize: '0.85rem', margin: 0 }}>ساعات العمل بالإنجليزية (Hours EN)</label>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const arHours = document.getElementById('contact_hours_ar')?.value;
+                          if (!arHours || !arHours.trim()) {
+                            showAlert('يرجى كتابة مواعيد العمل بالعربية أولاً ليتم ترجمتها', 'error');
+                            return;
+                          }
+                          setLoading(true);
+                          try {
+                            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(arHours)}&langpair=ar|en`);
+                            const data = await res.json();
+                            if (data && data.responseData && data.responseData.translatedText) {
+                              const trans = data.responseData.translatedText;
+                              document.getElementById('contact_hours_en').value = trans;
+                            } else {
+                              showAlert('فشلت الترجمة التلقائية، يرجى تعبئتها يدوياً', 'error');
+                            }
+                          } catch (e) {
+                            showAlert('حدث خطأ أثناء الترجمة', 'error');
+                          }
+                          setLoading(false);
+                        }}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary-gold)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'var(--font-arabic)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                      >
+                        <Languages size={13} />
+                        <span>ترجمة تلقائية</span>
+                      </button>
+                    </div>
+                    <input 
+                      type="text" 
+                      id="contact_hours_en"
+                      name="hoursEn" 
+                      className="form-control" 
+                      defaultValue={contactData.hoursEn || ''} 
+                      placeholder="e.g. 10 AM — 8 PM (Daily except Friday)"
                       style={{ fontFamily: 'var(--font-arabic)' }}
                     />
                   </div>
