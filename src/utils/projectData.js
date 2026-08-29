@@ -138,6 +138,15 @@ const PROJECTS_KEY = 'aura_nest_projects';
 const CATEGORIES_KEY = 'aura_nest_categories';
 const CONTACT_KEY = 'aura_nest_contact';
 
+// Safe localStorage set helper to prevent QuotaExceededError crashes
+function safeSetLocalStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn(`LocalStorage write failed for key "${key}" (likely quota exceeded):`, e);
+  }
+}
+
 // Default contact info
 export const DEFAULT_CONTACT = {
   address: 'التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني',
@@ -153,13 +162,13 @@ export const DEFAULT_CONTACT = {
 
 // Initialize localStorage values if not already present
 if (!localStorage.getItem(PROJECTS_KEY)) {
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(INITIAL_PROJECTS));
+  safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(INITIAL_PROJECTS));
 }
 if (!localStorage.getItem(CATEGORIES_KEY)) {
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(MAIN_CATEGORIES));
+  safeSetLocalStorage(CATEGORIES_KEY, JSON.stringify(MAIN_CATEGORIES));
 }
 if (!localStorage.getItem(CONTACT_KEY)) {
-  localStorage.setItem(CONTACT_KEY, JSON.stringify(DEFAULT_CONTACT));
+  safeSetLocalStorage(CONTACT_KEY, JSON.stringify(DEFAULT_CONTACT));
 }
 
 // Synchronous Getters (instantly returns cached data)
@@ -203,7 +212,7 @@ export async function fetchProjectsFromSupabase() {
       .order('id', { ascending: true });
     if (error) throw error;
     if (data && data.length > 0) {
-      localStorage.setItem(PROJECTS_KEY, JSON.stringify(data));
+      safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(data));
       return data;
     }
   } catch (err) {
@@ -221,7 +230,7 @@ export async function fetchCategoriesFromSupabase() {
       .order('id', { ascending: true });
     if (error) throw error;
     if (data && data.length > 0) {
-      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(data));
+      safeSetLocalStorage(CATEGORIES_KEY, JSON.stringify(data));
       return data;
     }
   } catch (err) {
@@ -240,7 +249,7 @@ export async function fetchContactInfoFromSupabase() {
       .single();
     if (error && error.code !== 'PGRST116') throw error;
     if (data) {
-      localStorage.setItem(CONTACT_KEY, JSON.stringify(data));
+      safeSetLocalStorage(CONTACT_KEY, JSON.stringify(data));
       return data;
     }
   } catch (err) {
@@ -253,7 +262,7 @@ export async function fetchContactInfoFromSupabase() {
 export async function addCategory(category) {
   const current = getCategories();
   const updated = [...current, category];
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(CATEGORIES_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -270,7 +279,7 @@ export async function addCategory(category) {
 export async function updateCategory(category) {
   const current = getCategories();
   const updated = current.map(c => c.id === category.id ? category : c);
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(CATEGORIES_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -288,7 +297,7 @@ export async function updateCategory(category) {
 export async function deleteCategory(id) {
   const current = getCategories();
   const updated = current.filter(c => c.id !== id);
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(CATEGORIES_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -305,11 +314,10 @@ export async function deleteCategory(id) {
 
 export async function addProject(project) {
   const current = getProjects();
-  // Get next available ID
   const nextId = current.length > 0 ? Math.max(...current.map(p => p.id)) + 1 : 1;
   const newProject = { ...project, id: nextId };
   const updated = [...current, newProject];
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -326,7 +334,7 @@ export async function addProject(project) {
 export async function updateProject(project) {
   const current = getProjects();
   const updated = current.map(p => p.id === project.id ? project : p);
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -344,7 +352,7 @@ export async function updateProject(project) {
 export async function deleteProject(id) {
   const current = getProjects();
   const updated = current.filter(p => p.id !== id);
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(PROJECTS_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
@@ -361,7 +369,7 @@ export async function deleteProject(id) {
 
 export async function updateContactInfo(info) {
   const updated = { ...info, id: 1 };
-  localStorage.setItem(CONTACT_KEY, JSON.stringify(updated));
+  safeSetLocalStorage(CONTACT_KEY, JSON.stringify(updated));
 
   if (!supabase) return updated;
   try {
