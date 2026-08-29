@@ -10,6 +10,7 @@ import {
   getCategories, fetchCategoriesFromSupabase, addCategory, updateCategory, deleteCategory,
   getContactInfo, fetchContactInfoFromSupabase, updateContactInfo
 } from '../utils/projectData';
+import Logo from '../components/Logo';
 
 export default function AdminPanel() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -322,8 +323,95 @@ export default function AdminPanel() {
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', paddingTop: '2rem', paddingBottom: '4rem', direction: 'rtl', textAlign: 'right' }}>
+    <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', direction: 'rtl', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
       
+      {/* 1. BRANDED NAVBAR HEADER (styled exactly like the website's header navbar) */}
+      <header
+        style={{
+          position: 'sticky',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          backgroundColor: 'rgba(246, 244, 238, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(161, 154, 140, 0.15)',
+          boxShadow: 'var(--shadow-sm)',
+          height: '60px',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
+          {/* Right side: Logo & Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Logo height={28} isWhite={false} />
+            <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--dark-charcoal)', fontFamily: 'var(--font-arabic)', borderRight: '1px solid rgba(161, 154, 140, 0.3)', paddingRight: '0.75rem', marginRight: '0.75rem' }}>
+              لوحة التحكم
+            </span>
+          </div>
+
+          {/* Left side: Navigation links (styled like the main navbar text links) */}
+          {subView === 'list' && (
+            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+              <button 
+                onClick={() => setActiveTab('projects')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '0.92rem',
+                  fontWeight: activeTab === 'projects' ? 800 : 600,
+                  color: activeTab === 'projects' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
+                  cursor: 'pointer',
+                  padding: '0.4rem 0',
+                  fontFamily: 'var(--font-arabic)',
+                  borderBottom: activeTab === 'projects' ? '2px solid var(--primary-gold)' : '2px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                المشاريع ({projects.length})
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab('categories')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '0.92rem',
+                  fontWeight: activeTab === 'categories' ? 800 : 600,
+                  color: activeTab === 'categories' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
+                  cursor: 'pointer',
+                  padding: '0.4rem 0',
+                  fontFamily: 'var(--font-arabic)',
+                  borderBottom: activeTab === 'categories' ? '2px solid var(--primary-gold)' : '2px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                الفئات ({categories.length})
+              </button>
+
+              <button 
+                onClick={() => setActiveTab('contact')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '0.92rem',
+                  fontWeight: activeTab === 'contact' ? 800 : 600,
+                  color: activeTab === 'contact' ? 'var(--dark-charcoal)' : 'var(--text-gray)',
+                  cursor: 'pointer',
+                  padding: '0.4rem 0',
+                  fontFamily: 'var(--font-arabic)',
+                  borderBottom: activeTab === 'contact' ? '2px solid var(--primary-gold)' : '2px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                بيانات الاتصال
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
+
       {/* Centered Action Alert Modal */}
       <AnimatePresence>
         {alert.show && (
@@ -466,83 +554,8 @@ export default function AdminPanel() {
         )}
       </AnimatePresence>
 
-      <div className="container" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-        {/* Compact Header Block */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0, fontFamily: 'var(--font-arabic)' }}>لوحة التحكم AURA NEST</h1>
-          
-          {/* Tab Navigation directly in the header */}
-          {subView === 'list' && (
-            <div style={{ display: 'flex', gap: '0.25rem', direction: 'rtl', flexWrap: 'wrap' }}>
-              <button 
-                onClick={() => setActiveTab('projects')}
-                style={{
-                  padding: '0.45rem 0.85rem',
-                  background: activeTab === 'projects' ? 'var(--primary-gold)' : 'none',
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: activeTab === 'projects' ? 'var(--white)' : 'var(--text-gray)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.25s',
-                  fontFamily: 'var(--font-arabic)'
-                }}
-              >
-                <Briefcase size={14} />
-                <span>المشاريع ({projects.length})</span>
-              </button>
-              
-              <button 
-                onClick={() => setActiveTab('categories')}
-                style={{
-                  padding: '0.45rem 0.85rem',
-                  background: activeTab === 'categories' ? 'var(--primary-gold)' : 'none',
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: activeTab === 'categories' ? 'var(--white)' : 'var(--text-gray)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.25s',
-                  fontFamily: 'var(--font-arabic)'
-                }}
-              >
-                <Layers size={14} />
-                <span>الفئات ({categories.length})</span>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('contact')}
-                style={{
-                  padding: '0.45rem 0.85rem',
-                  background: activeTab === 'contact' ? 'var(--primary-gold)' : 'none',
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: activeTab === 'contact' ? 'var(--white)' : 'var(--text-gray)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.25s',
-                  fontFamily: 'var(--font-arabic)'
-                }}
-              >
-                <PhoneCall size={14} />
-                <span>بيانات الاتصال</span>
-              </button>
-            </div>
-          )}
-        </div>
-
+      {/* Main Container below Header */}
+      <div className="container" style={{ paddingTop: '2.5rem', paddingBottom: '4rem', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
         {/* Tab Contents */}
         {loading && subView === 'list' && (
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
@@ -556,51 +569,62 @@ export default function AdminPanel() {
           <>
             {activeTab === 'categories' && (
               <div style={{ direction: 'rtl' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ fontSize: '1.05rem', color: 'var(--dark-charcoal)', fontWeight: 800, fontFamily: 'var(--font-arabic)' }}>إدارة الفئات الهندسية</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 800, fontFamily: 'var(--font-arabic)' }}>إدارة الفئات الهندسية</h3>
                   <button 
                     onClick={() => setSearchParams({ view: 'add-category' })}
                     className="btn btn-primary" 
-                    style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem', fontFamily: 'var(--font-arabic)' }}
+                    style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', fontFamily: 'var(--font-arabic)' }}
                   >
                     <Plus size={14} style={{ marginLeft: '0.25rem' }} />
                     <span>إضافة فئة جديدة</span>
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                   {categories.map(cat => (
-                    <div key={cat.id} style={{ padding: '1.25rem 0', borderBottom: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '0.85rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                        {cat.bannerImg && (
-                          <div style={{ width: '70px', height: '50px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)', flexShrink: 0 }}>
-                            <img src={cat.bannerImg} alt={cat.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </div>
-                        )}
-                        <div style={{ flexGrow: 1 }}>
-                          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0, fontFamily: 'var(--font-arabic)' }}>{cat.title}</h4>
-                          <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 600 }}>معرّف المسار: /{cat.id}</span>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.25rem', margin: 0 }}>{cat.desc}</p>
+                    <div 
+                      key={cat.id} 
+                      style={{ 
+                        padding: '1.5rem', 
+                        backgroundColor: 'var(--white)', 
+                        border: '1px solid var(--light-beige)', 
+                        borderRadius: '6px',
+                        boxShadow: 'var(--shadow-sm)',
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: '1rem', 
+                        textAlign: 'right' 
+                      }}
+                    >
+                      {cat.bannerImg && (
+                        <div style={{ height: '120px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
+                          <img src={cat.bannerImg} alt={cat.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        
-                        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                          <button 
-                            onClick={() => setSearchParams({ view: 'edit-category', id: cat.id })}
-                            className="btn" 
-                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', fontFamily: 'var(--font-arabic)' }}
-                          >
-                            <Edit2 size={13} style={{ marginLeft: '0.2rem' }} />
-                            <span>تعديل</span>
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteCategory(cat.id)}
-                            className="btn" 
-                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', border: '1px solid #f9d5d5', color: '#e74c3c', backgroundColor: 'transparent', fontFamily: 'var(--font-arabic)' }}
-                          >
-                            <Trash2 size={13} style={{ marginLeft: '0.2rem' }} />
-                            <span>حذف</span>
-                          </button>
-                        </div>
+                      )}
+                      <div>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0, fontFamily: 'var(--font-arabic)' }}>{cat.title}</h4>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--primary-gold)', fontWeight: 600 }}>معرّف المسار: /{cat.id}</span>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: 0 }}>{cat.desc}</p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
+                        <button 
+                          onClick={() => setSearchParams({ view: 'edit-category', id: cat.id })}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.45rem', fontSize: '0.82rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center', fontFamily: 'var(--font-arabic)' }}
+                        >
+                          <Edit2 size={13} style={{ marginLeft: '0.2rem' }} />
+                          <span>تعديل</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.45rem', fontSize: '0.82rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6', fontFamily: 'var(--font-arabic)' }}
+                        >
+                          <Trash2 size={13} style={{ marginLeft: '0.2rem' }} />
+                          <span>حذف</span>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -610,58 +634,75 @@ export default function AdminPanel() {
 
             {activeTab === 'projects' && (
               <div style={{ direction: 'rtl' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ fontSize: '1.05rem', color: 'var(--dark-charcoal)', fontWeight: 800, fontFamily: 'var(--font-arabic)' }}>إدارة المشاريع (أعمالنا)</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 800, fontFamily: 'var(--font-arabic)' }}>إدارة المشاريع (أعمالنا)</h3>
                   <button 
                     onClick={() => setSearchParams({ view: 'add-project' })}
                     className="btn btn-primary" 
-                    style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem', fontFamily: 'var(--font-arabic)' }}
+                    style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', fontFamily: 'var(--font-arabic)' }}
                   >
                     <Plus size={14} style={{ marginLeft: '0.25rem' }} />
                     <span>إضافة مشروع جديد</span>
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                   {projects.map(proj => (
-                    <div key={proj.id} style={{ padding: '1.25rem 0', borderBottom: '1px solid var(--light-beige)', display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                        {(proj.customImg || proj.defaultImg) && (
-                          <div style={{ width: '80px', height: '60px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)', flexShrink: 0 }}>
-                            <img src={proj.customImg || proj.defaultImg} alt={proj.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </div>
-                        )}
-                        <div style={{ flexGrow: 1, minWidth: '200px' }}>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--primary-gold)', fontWeight: 700, backgroundColor: 'rgba(161, 154, 140, 0.1)', padding: '0.15rem 0.4rem', borderRadius: '3px', fontFamily: 'var(--font-arabic)' }}>
-                            {proj.category}
-                          </span>
-                          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: '0.35rem 0 0 0', fontFamily: 'var(--font-arabic)' }}>{proj.title}</h4>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--warm-gray)', display: 'block' }}>{proj.subtitle}</span>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-gray)', marginTop: '0.25rem' }}>
-                            <span>📍 {proj.location}</span>
-                            <span>📐 {proj.space}</span>
-                            <span>⏳ {proj.duration}</span>
-                          </div>
+                    <div 
+                      key={proj.id} 
+                      style={{ 
+                        padding: '1.5rem', 
+                        backgroundColor: 'var(--white)', 
+                        border: '1px solid var(--light-beige)', 
+                        borderRadius: '6px',
+                        boxShadow: 'var(--shadow-sm)',
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: '1rem', 
+                        textAlign: 'right' 
+                      }}
+                    >
+                      {(proj.customImg || proj.defaultImg) && (
+                        <div style={{ height: '140px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--light-beige)' }}>
+                          <img src={proj.customImg || proj.defaultImg} alt={proj.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        
-                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexShrink: 0 }}>
-                          <button 
-                            onClick={() => setSearchParams({ view: 'edit-project', id: proj.id })}
-                            className="btn" 
-                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', fontFamily: 'var(--font-arabic)' }}
-                          >
-                            <Edit2 size={13} style={{ marginLeft: '0.2rem' }} />
-                            <span>تعديل</span>
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteProject(proj.id)}
-                            className="btn" 
-                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', border: '1px solid #f9d5d5', color: '#e74c3c', backgroundColor: 'transparent', fontFamily: 'var(--font-arabic)' }}
-                          >
-                            <Trash2 size={13} style={{ marginLeft: '0.2rem' }} />
-                            <span>حذف</span>
-                          </button>
-                        </div>
+                      )}
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--primary-gold)', fontWeight: 700, backgroundColor: 'var(--ivory)', padding: '0.2rem 0.5rem', borderRadius: '3px', fontFamily: 'var(--font-arabic)' }}>
+                          {proj.category}
+                        </span>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: '0.5rem 0 0 0', fontFamily: 'var(--font-arabic)' }}>{proj.title}</h4>
+                        <span style={{ fontSize: '0.82rem', color: 'var(--warm-gray)', display: 'block' }}>{proj.subtitle}</span>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', lineHeight: '1.5', marginTop: '0.5rem', margin: 0 }}>
+                          {proj.desc && proj.desc.length > 100 ? `${proj.desc.substring(0, 100)}...` : proj.desc}
+                        </p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-gray)' }}>
+                        <span>📍 {proj.location}</span>
+                        <span>•</span>
+                        <span>📐 {proj.space}</span>
+                        <span>•</span>
+                        <span>⏳ {proj.duration}</span>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto', borderTop: '1px solid var(--light-beige)', paddingTop: '0.75rem' }}>
+                        <button 
+                          onClick={() => setSearchParams({ view: 'edit-project', id: proj.id })}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.45rem', fontSize: '0.82rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', justifyContent: 'center', fontFamily: 'var(--font-arabic)' }}
+                        >
+                          <Edit2 size={13} style={{ marginLeft: '0.2rem' }} />
+                          <span>تعديل</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteProject(proj.id)}
+                          className="btn" 
+                          style={{ flexGrow: 1, padding: '0.45rem', fontSize: '0.82rem', border: '1px solid #f9d5d5', color: '#e74c3c', justifyContent: 'center', backgroundColor: '#fff6f6', fontFamily: 'var(--font-arabic)' }}
+                        >
+                          <Trash2 size={13} style={{ marginLeft: '0.2rem' }} />
+                          <span>حذف</span>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -670,8 +711,18 @@ export default function AdminPanel() {
             )}
 
             {activeTab === 'contact' && (
-              <div style={{ direction: 'rtl', textAlign: 'right' }}>
-                <h3 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 800, marginBottom: '1.5rem', fontFamily: 'var(--font-arabic)' }}>
+              <div 
+                style={{ 
+                  padding: '2rem', 
+                  backgroundColor: 'var(--white)', 
+                  border: '1px solid var(--light-beige)', 
+                  borderRadius: '6px',
+                  boxShadow: 'var(--shadow-sm)',
+                  direction: 'rtl', 
+                  textAlign: 'right' 
+                }}
+              >
+                <h3 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 800, marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem', fontFamily: 'var(--font-arabic)' }}>
                   تعديل بيانات التواصل والموقع الأساسية
                 </h3>
                 
@@ -774,8 +825,18 @@ export default function AdminPanel() {
 
         {/* ADD/EDIT CATEGORY VIEW */}
         {(subView === 'add-category' || subView === 'edit-category') && (
-          <div style={{ direction: 'rtl', textAlign: 'right' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '1.5rem', fontFamily: 'var(--font-arabic)' }}>
+          <div 
+            style={{ 
+              padding: '2rem', 
+              backgroundColor: 'var(--white)', 
+              border: '1px solid var(--light-beige)', 
+              borderRadius: '6px',
+              boxShadow: 'var(--shadow-sm)',
+              direction: 'rtl', 
+              textAlign: 'right' 
+            }}
+          >
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem', fontFamily: 'var(--font-arabic)' }}>
               {subView === 'edit-category' ? 'تعديل الفئة الهندسية' : 'إضافة فئة هندسية جديدة'}
             </h3>
 
@@ -877,8 +938,18 @@ export default function AdminPanel() {
 
         {/* ADD/EDIT PROJECT VIEW */}
         {(subView === 'add-project' || subView === 'edit-project') && (
-          <div style={{ direction: 'rtl', textAlign: 'right' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '1.5rem', fontFamily: 'var(--font-arabic)' }}>
+          <div 
+            style={{ 
+              padding: '2rem', 
+              backgroundColor: 'var(--white)', 
+              border: '1px solid var(--light-beige)', 
+              borderRadius: '6px',
+              boxShadow: 'var(--shadow-sm)',
+              direction: 'rtl', 
+              textAlign: 'right' 
+            }}
+          >
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '2rem', borderBottom: '1px solid var(--light-beige)', paddingBottom: '0.75rem', fontFamily: 'var(--font-arabic)' }}>
               {subView === 'edit-project' ? 'تعديل تفاصيل المشروع' : 'إضافة مشروع جديد للمعرض'}
             </h3>
 
