@@ -146,7 +146,9 @@ export const DEFAULT_CONTACT = {
   email: 'info@aura-nest.net',
   emailLink: 'mailto:info@aura-nest.net',
   hours: '١٠ ص — ٨ م (يومياً عدا الجمعة)',
-  whatsapp: '201111014008'
+  whatsapp: '201111014008',
+  facebook: 'https://www.facebook.com/share/1Q51A4NmPs/',
+  instagram: 'https://instagram.com/'
 };
 
 // Initialize localStorage values if not already present

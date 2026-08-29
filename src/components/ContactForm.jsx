@@ -234,7 +234,7 @@ export default function ContactForm() {
 
               {/* Instagram */}
               <a
-                href="https://instagram.com/"
+                href={contactData.instagram || "https://instagram.com/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -271,7 +271,7 @@ export default function ContactForm() {
 
               {/* Facebook */}
               <a
-                href="https://www.facebook.com/share/1Q51A4NmPs/"
+                href={contactData.facebook || "https://www.facebook.com/share/1Q51A4NmPs/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

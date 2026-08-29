@@ -194,7 +194,9 @@ export default function AdminPanel() {
       email: formData.get('email'),
       emailLink: `mailto:${formData.get('email')}`,
       hours: formData.get('hours'),
-      whatsapp: formData.get('whatsapp')
+      whatsapp: formData.get('whatsapp'),
+      facebook: formData.get('facebook'),
+      instagram: formData.get('instagram')
     };
 
     setLoading(true);
@@ -537,6 +539,28 @@ export default function AdminPanel() {
                   className="form-control" 
                   defaultValue={contactData.whatsapp || ''} 
                   placeholder="مثال: 201111014008"
+                />
+              </div>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label">رابط صفحة الفيسبوك (Facebook)</label>
+                <input 
+                  type="text" 
+                  name="facebook" 
+                  className="form-control" 
+                  defaultValue={contactData.facebook || ''} 
+                  placeholder="مثال: https://www.facebook.com/..."
+                />
+              </div>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label">رابط حساب الإنستجرام (Instagram)</label>
+                <input 
+                  type="text" 
+                  name="instagram" 
+                  className="form-control" 
+                  defaultValue={contactData.instagram || ''} 
+                  placeholder="مثال: https://instagram.com/..."
                 />
               </div>
 

@@ -77,7 +77,7 @@ export default function Footer() {
             {/* Social Media Links */}
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-start', marginTop: '0.25rem' }}>
               <a
-                href="https://www.facebook.com/share/1Q51A4NmPs/"
+                href={contactData.facebook || "https://www.facebook.com/share/1Q51A4NmPs/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -96,7 +96,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com/"
+                href={contactData.instagram || "https://instagram.com/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
