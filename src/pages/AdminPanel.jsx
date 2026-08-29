@@ -35,6 +35,16 @@ export default function AdminPanel() {
   // Success alerts
   const [alert, setAlert] = useState({ show: false, message: '', type: 'success' });
 
+  // Confirm Modal state
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+    status: 'idle', // 'idle', 'loading', 'success'
+    successMessage: ''
+  });
+
   // Load initial data
   useEffect(() => {
     if (isAuthenticated) {
@@ -168,14 +178,23 @@ export default function AdminPanel() {
     setSearchParams({}); // return back to list view
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (window.confirm('هل أنت متأكد من حذف هذه الفئة؟ سيتم حذفها من القوائم.')) {
-      setLoading(true);
-      const updated = await deleteCategory(id);
-      setCategories(updated);
-      setLoading(false);
-      showAlert('تم حذف الفئة بنجاح');
-    }
+  const handleDeleteCategory = (id) => {
+    setConfirmModal({
+      show: true,
+      title: 'تأكيد حذف الفئة',
+      message: 'هل أنت متأكد من حذف هذه الفئة؟ سيتم حذفها نهائياً من القوائم.',
+      status: 'idle',
+      successMessage: 'تم حذف الفئة بنجاح',
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, status: 'loading' }));
+        const updated = await deleteCategory(id);
+        setCategories(updated);
+        setConfirmModal(prev => ({ ...prev, status: 'success' }));
+        setTimeout(() => {
+          setConfirmModal(prev => ({ ...prev, show: false }));
+        }, 1500);
+      }
+    });
   };
 
   // Project Actions
@@ -220,14 +239,23 @@ export default function AdminPanel() {
     setSearchParams({}); // return back to list view
   };
 
-  const handleDeleteProject = async (id) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
-      setLoading(true);
-      const updated = await deleteProject(id);
-      setProjects(updated);
-      setLoading(false);
-      showAlert('تم حذف المشروع بنجاح');
-    }
+  const handleDeleteProject = (id) => {
+    setConfirmModal({
+      show: true,
+      title: 'تأكيد حذف المشروع',
+      message: 'هل أنت متأكد من حذف هذا المشروع؟ سيتم إزالته نهائياً من معرض الأعمال.',
+      status: 'idle',
+      successMessage: 'تم حذف المشروع بنجاح',
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, status: 'loading' }));
+        const updated = await deleteProject(id);
+        setProjects(updated);
+        setConfirmModal(prev => ({ ...prev, status: 'success' }));
+        setTimeout(() => {
+          setConfirmModal(prev => ({ ...prev, show: false }));
+        }, 1500);
+      }
+    });
   };
 
   // Contact Actions
@@ -296,31 +324,144 @@ export default function AdminPanel() {
   return (
     <div style={{ backgroundColor: 'var(--ivory)', minHeight: '100vh', paddingTop: '2rem', paddingBottom: '4rem', direction: 'rtl', textAlign: 'right' }}>
       
-      {/* Alert Component */}
+      {/* Centered Action Alert Modal */}
       <AnimatePresence>
         {alert.show && (
           <motion.div 
-            initial={{ opacity: 0, y: -40, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -40, x: '-50%' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             style={{
               position: 'fixed',
-              top: '20px',
-              left: '50%',
-              zIndex: 999999,
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(63, 64, 66, 0.2)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              zIndex: 99999999,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '4px',
-              backgroundColor: alert.type === 'success' ? '#2ecc71' : '#e74c3c',
-              color: 'var(--white)',
-              boxShadow: 'var(--shadow-md)',
-              fontFamily: 'var(--font-arabic)'
+              justifyContent: 'center',
+              padding: '1.5rem',
+              direction: 'rtl'
             }}
           >
-            {alert.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
-            <span style={{ fontSize: '0.9rem' }}>{alert.message}</span>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              style={{
+                backgroundColor: 'var(--white)',
+                borderRadius: '6px',
+                padding: '2rem 3rem',
+                border: '1px solid var(--light-beige)',
+                boxShadow: 'var(--shadow-lg)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+                textAlign: 'center',
+                maxWidth: '340px',
+                width: '100%'
+              }}
+            >
+              <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: alert.type === 'success' ? 'rgba(46, 204, 113, 0.12)' : 'rgba(231, 76, 60, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: alert.type === 'success' ? '#2ecc71' : '#e74c3c' }}>
+                {alert.type === 'success' ? <CheckCircle size={22} /> : <AlertCircle size={22} />}
+              </div>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dark-charcoal)', margin: 0, fontFamily: 'var(--font-arabic)' }}>
+                {alert.message}
+              </h4>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Centered Confirmation Modal with Backdrop Blur */}
+      <AnimatePresence>
+        {confirmModal.show && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(63, 64, 66, 0.4)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              zIndex: 99999999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.5rem',
+              direction: 'rtl'
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              style={{
+                width: '100%',
+                maxWidth: '400px',
+                backgroundColor: 'var(--white)',
+                borderRadius: '8px',
+                padding: '2.25rem 2rem',
+                boxShadow: 'var(--shadow-lg)',
+                textAlign: 'center',
+                border: '1px solid var(--light-beige)'
+              }}
+            >
+              {confirmModal.status === 'idle' && (
+                <>
+                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--dark-charcoal)', marginBottom: '0.65rem', fontFamily: 'var(--font-arabic)' }}>
+                    {confirmModal.title}
+                  </h4>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-gray)', marginBottom: '2rem', lineHeight: '1.6', fontFamily: 'var(--font-arabic)' }}>
+                    {confirmModal.message}
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                    <button
+                      onClick={confirmModal.onConfirm}
+                      className="btn btn-primary"
+                      style={{ padding: '0.65rem 1.75rem', fontSize: '0.85rem', fontFamily: 'var(--font-arabic)', backgroundColor: '#e74c3c', borderColor: '#e74c3c' }}
+                    >
+                      تأكيد الحذف
+                    </button>
+                    <button
+                      onClick={() => setConfirmModal(prev => ({ ...prev, show: false }))}
+                      className="btn"
+                      style={{ padding: '0.65rem 1.75rem', fontSize: '0.85rem', border: '1px solid var(--light-beige)', color: 'var(--text-gray)', fontFamily: 'var(--font-arabic)' }}
+                    >
+                      إلغاء
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {confirmModal.status === 'loading' && (
+                <div style={{ padding: '1rem 0' }}>
+                  <div style={{ width: '36px', height: '36px', border: '2px solid var(--light-beige)', borderTopColor: '#e74c3c', borderRadius: '50%', margin: '0 auto 1.25rem auto', animation: 'spin 1s infinite linear' }} />
+                  <p style={{ color: 'var(--text-gray)', fontSize: '0.9rem', fontFamily: 'var(--font-arabic)', margin: 0 }}>يتم الآن معالجة الحذف...</p>
+                </div>
+              )}
+
+              {confirmModal.status === 'success' && (
+                <div style={{ padding: '1rem 0' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '50%', backgroundColor: 'rgba(46, 204, 113, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2ecc71', margin: '0 auto 1rem auto' }}>
+                    <CheckCircle size={24} />
+                  </div>
+                  <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2ecc71', margin: 0, fontFamily: 'var(--font-arabic)' }}>
+                    {confirmModal.successMessage}
+                  </h4>
+                </div>
+              )}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
