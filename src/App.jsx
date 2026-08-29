@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
+import AdminPanel from './pages/AdminPanel';
 import Footer from './components/Footer';
 import SplashScreen from './components/SplashScreen';
 import PageLoader from './components/PageLoader';
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/project/:id" element={<ProjectDetailPage />} />
+            <Route path="/control" element={<AdminPanel />} />
           </Routes>
         </main>
         <Footer />

@@ -131,15 +131,245 @@ export const MAIN_CATEGORIES = [
   }
 ];
 
-export function getProjects() {
-  const savedImages = localStorage.getItem('aura_nest_custom_images');
-  if (savedImages) {
-    try {
-      const parsed = JSON.parse(savedImages);
-      return INITIAL_PROJECTS.map(p => (parsed[p.id] ? { ...p, customImg: parsed[p.id] } : p));
-    } catch (e) {
-      console.error('Error parsing localStorage images', e);
-    }
-  }
-  return INITIAL_PROJECTS;
+import { supabase } from './supabase';
+
+// LocalStorage keys
+const PROJECTS_KEY = 'aura_nest_projects';
+const CATEGORIES_KEY = 'aura_nest_categories';
+const CONTACT_KEY = 'aura_nest_contact';
+
+// Default contact info
+export const DEFAULT_CONTACT = {
+  address: 'التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني',
+  phone: '01111 014 008',
+  phoneLink: 'tel:01111014008',
+  email: 'info@aura-nest.net',
+  emailLink: 'mailto:info@aura-nest.net',
+  hours: '١٠ ص — ٨ م (يومياً عدا الجمعة)',
+  whatsapp: '201111014008'
+};
+
+// Initialize localStorage values if not already present
+if (!localStorage.getItem(PROJECTS_KEY)) {
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(INITIAL_PROJECTS));
 }
+if (!localStorage.getItem(CATEGORIES_KEY)) {
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(MAIN_CATEGORIES));
+}
+if (!localStorage.getItem(CONTACT_KEY)) {
+  localStorage.setItem(CONTACT_KEY, JSON.stringify(DEFAULT_CONTACT));
+}
+
+// Synchronous Getters (instantly returns cached data)
+export function getProjects() {
+  try {
+    const saved = localStorage.getItem(PROJECTS_KEY);
+    return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
+  } catch (e) {
+    console.error('Error reading projects cache:', e);
+    return INITIAL_PROJECTS;
+  }
+}
+
+export function getCategories() {
+  try {
+    const saved = localStorage.getItem(CATEGORIES_KEY);
+    return saved ? JSON.parse(saved) : MAIN_CATEGORIES;
+  } catch (e) {
+    console.error('Error reading categories cache:', e);
+    return MAIN_CATEGORIES;
+  }
+}
+
+export function getContactInfo() {
+  try {
+    const saved = localStorage.getItem(CONTACT_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_CONTACT;
+  } catch (e) {
+    console.error('Error reading contact cache:', e);
+    return DEFAULT_CONTACT;
+  }
+}
+
+// Asynchronous Synchers (background sync with database)
+export async function fetchProjectsFromSupabase() {
+  if (!supabase) return getProjects();
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    if (data && data.length > 0) {
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch (err) {
+    console.error('Failed to sync projects from Supabase:', err);
+  }
+  return getProjects();
+}
+
+export async function fetchCategoriesFromSupabase() {
+  if (!supabase) return getCategories();
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    if (data && data.length > 0) {
+      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch (err) {
+    console.error('Failed to sync categories from Supabase:', err);
+  }
+  return getCategories();
+}
+
+export async function fetchContactInfoFromSupabase() {
+  if (!supabase) return getContactInfo();
+  try {
+    const { data, error } = await supabase
+      .from('contact_info')
+      .select('*')
+      .eq('id', 1)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error;
+    if (data) {
+      localStorage.setItem(CONTACT_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch (err) {
+    console.error('Failed to sync contact info from Supabase:', err);
+  }
+  return getContactInfo();
+}
+
+// Database Modification Handlers
+export async function addCategory(category) {
+  const current = getCategories();
+  const updated = [...current, category];
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .insert([category]);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase addCategory failed:', err);
+  }
+  return updated;
+}
+
+export async function updateCategory(category) {
+  const current = getCategories();
+  const updated = current.map(c => c.id === category.id ? category : c);
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .update(category)
+      .eq('id', category.id);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase updateCategory failed:', err);
+  }
+  return updated;
+}
+
+export async function deleteCategory(id) {
+  const current = getCategories();
+  const updated = current.filter(c => c.id !== id);
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase deleteCategory failed:', err);
+  }
+  return updated;
+}
+
+export async function addProject(project) {
+  const current = getProjects();
+  // Get next available ID
+  const nextId = current.length > 0 ? Math.max(...current.map(p => p.id)) + 1 : 1;
+  const newProject = { ...project, id: nextId };
+  const updated = [...current, newProject];
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .insert([newProject]);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase addProject failed:', err);
+  }
+  return updated;
+}
+
+export async function updateProject(project) {
+  const current = getProjects();
+  const updated = current.map(p => p.id === project.id ? project : p);
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .update(project)
+      .eq('id', project.id);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase updateProject failed:', err);
+  }
+  return updated;
+}
+
+export async function deleteProject(id) {
+  const current = getProjects();
+  const updated = current.filter(p => p.id !== id);
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase deleteProject failed:', err);
+  }
+  return updated;
+}
+
+export async function updateContactInfo(info) {
+  const updated = { ...info, id: 1 };
+  localStorage.setItem(CONTACT_KEY, JSON.stringify(updated));
+
+  if (!supabase) return updated;
+  try {
+    const { error } = await supabase
+      .from('contact_info')
+      .upsert([updated]);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Supabase updateContactInfo failed:', err);
+  }
+  return updated;
+}
+

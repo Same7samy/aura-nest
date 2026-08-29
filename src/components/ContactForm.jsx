@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Clock, Send, Mail } from 'lucide-react';
+import { getContactInfo, fetchContactInfoFromSupabase } from '../utils/projectData';
 
 export default function ContactForm() {
+  const [contactData, setContactData] = useState(getContactInfo());
+
+  useEffect(() => {
+    fetchContactInfoFromSupabase().then(data => {
+      if (data) setContactData(data);
+    });
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -44,10 +53,10 @@ export default function ContactForm() {
 - الخدمة المطلوبة: ${formData.service}`;
 
     // Encode text and redirect to WhatsApp link
-    const waNumber = '201111014008'; // International format for Egypt (+20)
+    const waNumber = contactData.whatsapp || '201111014008'; // International format for Egypt (+20)
     const encodedText = encodeURIComponent(formattedText);
     const waUrl = `https://wa.me/${waNumber}?text=${encodedText}`;
-
+ 
     // Open link in a new tab
     window.open(waUrl, '_blank');
   };
@@ -56,24 +65,24 @@ export default function ContactForm() {
     {
       icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: 'العنوان',
-      desc: 'التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني'
+      desc: contactData.address
     },
     {
       icon: <Phone size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: 'الهاتف / واتساب',
-      desc: '01111 014 008',
-      link: 'tel:01111014008'
+      desc: contactData.phone,
+      link: contactData.phoneLink
     },
     {
       icon: <Mail size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: 'البريد الإلكتروني',
-      desc: 'info@aura-nest.net',
-      link: 'mailto:info@aura-nest.net'
+      desc: contactData.email,
+      link: contactData.emailLink
     },
     {
       icon: <Clock size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: 'ساعات العمل',
-      desc: '١٠ ص — ٨ م (يومياً عدا الجمعة)'
+      desc: contactData.hours
     }
   ];
 
@@ -159,7 +168,7 @@ export default function ContactForm() {
             <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'flex-start', marginTop: '0.5rem', paddingRight: '0.5rem' }}>
               {/* Call */}
               <a
-                href="tel:01111014008"
+                href={contactData.phoneLink || "tel:01111014008"}
                 style={{
                   width: '46px',
                   height: '46px',
@@ -190,7 +199,7 @@ export default function ContactForm() {
 
               {/* WhatsApp */}
               <a
-                href="https://wa.me/201111014008"
+                href={`https://wa.me/${contactData.whatsapp || '201111014008'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

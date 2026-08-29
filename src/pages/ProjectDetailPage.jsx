@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Calendar, MapPin, ShieldCheck, MessageSquare } from 'lucide-react';
-import { getProjects, MAIN_CATEGORIES } from '../utils/projectData';
+import { getProjects, fetchProjectsFromSupabase } from '../utils/projectData';
 import ContactForm from '../components/ContactForm';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(getProjects());
   useEffect(() => {
     setProjects(getProjects());
+    fetchProjectsFromSupabase().then(dbProjs => {
+      if (dbProjs) setProjects(dbProjs);
+    });
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -90,6 +93,38 @@ export default function ProjectDetailPage() {
                 />
               </div>
 
+              {/* Gallery Images Grid */}
+              {project.gallery && project.gallery.length > 0 && (
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--dark-charcoal)', marginBottom: '0.75rem', textAlign: 'right' }}>
+                    معرض الصور الكامل للمشروع
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
+                    {project.gallery.map((img, idx) => (
+                      <div 
+                        key={idx} 
+                        style={{ 
+                          height: '90px', 
+                          borderRadius: '6px', 
+                          overflow: 'hidden', 
+                          boxShadow: 'var(--shadow-sm)', 
+                          border: '1px solid var(--light-beige)'
+                        }}
+                      >
+                        <a href={img} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
+                          <img 
+                            src={img} 
+                            alt={`${project.title} gallery ${idx + 1}`} 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.06)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+                          />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Information Column - Left Column in RTL */}

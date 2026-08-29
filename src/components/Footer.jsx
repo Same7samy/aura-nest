@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { Phone, MapPin, Heart, Mail } from 'lucide-react';
+import { getContactInfo, fetchContactInfoFromSupabase } from '../utils/projectData';
 
 export default function Footer() {
+  const [contactData, setContactData] = useState(getContactInfo());
+
+  useEffect(() => {
+    fetchContactInfoFromSupabase().then(data => {
+      if (data) setContactData(data);
+    });
+  }, []);
+
   const currentYear = new Date().getFullYear();
   const navigate = useNavigate();
   const location = useLocation();
@@ -147,13 +156,13 @@ export default function Footer() {
               <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                 <MapPin size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
                 <span style={{ fontSize: '0.92rem', color: 'var(--light-beige)', lineHeight: '1.5' }}>
-                  التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني
+                  {contactData.address}
                 </span>
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Phone size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0 }} />
                 <a
-                  href="tel:01111014008"
+                  href={contactData.phoneLink || "tel:01111014008"}
                   style={{
                     fontSize: '0.92rem',
                     color: 'var(--light-beige)',
@@ -164,13 +173,13 @@ export default function Footer() {
                   }}
                   className="footer-phone-link"
                 >
-                  01111 014 008
+                  {contactData.phone}
                 </a>
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Mail size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0 }} />
                 <a
-                  href="mailto:info@aura-nest.net"
+                  href={contactData.emailLink || "mailto:info@aura-nest.net"}
                   style={{
                     fontSize: '0.92rem',
                     color: 'var(--light-beige)',
@@ -180,7 +189,7 @@ export default function Footer() {
                   }}
                   className="footer-email-link"
                 >
-                  info@aura-nest.net
+                  {contactData.email}
                 </a>
               </li>
             </ul>

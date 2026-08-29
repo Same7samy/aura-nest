@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Compass, Hammer, Palette, Layers, ClipboardCheck, Building } from 'lucide-react';
-import { getProjects, MAIN_CATEGORIES } from '../utils/projectData';
+import { getProjects, fetchProjectsFromSupabase, getCategories, fetchCategoriesFromSupabase } from '../utils/projectData';
 
 export default function Portfolio() {
   const [categoryImages, setCategoryImages] = useState({});
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(getProjects());
+  const [categories, setCategories] = useState(getCategories());
 
-  useEffect(() => {
-    const projList = getProjects();
-    setProjects(projList);
+  const updateImages = (cats, projs) => {
     const images = {};
-    MAIN_CATEGORIES.forEach(cat => {
-      const catProjs = projList.filter(p => p.category === cat.title);
+    cats.forEach(cat => {
+      const catProjs = projs.filter(p => p.category === cat.title);
       if (catProjs.length > 0) {
         const randomProj = catProjs[Math.floor(Math.random() * catProjs.length)];
         images[cat.id] = randomProj.customImg || randomProj.defaultImg;
@@ -22,6 +21,20 @@ export default function Portfolio() {
       }
     });
     setCategoryImages(images);
+  };
+
+  useEffect(() => {
+    const localCats = getCategories();
+    const localProjs = getProjects();
+    setCategories(localCats);
+    setProjects(localProjs);
+    updateImages(localCats, localProjs);
+
+    Promise.all([fetchCategoriesFromSupabase(), fetchProjectsFromSupabase()]).then(([dbCats, dbProjs]) => {
+      if (dbCats) setCategories(dbCats);
+      if (dbProjs) setProjects(dbProjs);
+      updateImages(dbCats || localCats, dbProjs || localProjs);
+    });
   }, []);
 
   const getCategoryCount = (categoryTitle) => {
@@ -55,7 +68,7 @@ export default function Portfolio() {
           }}
           className="categories-grid"
         >
-          {MAIN_CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const projectCount = getCategoryCount(cat.title);
             const bgImg = categoryImages[cat.id] || '';
             

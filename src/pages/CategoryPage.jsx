@@ -2,22 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Trash2, CheckCircle, ArrowLeft } from 'lucide-react';
-import { getProjects, MAIN_CATEGORIES } from '../utils/projectData';
+import { getProjects, fetchProjectsFromSupabase, getCategories, fetchCategoriesFromSupabase } from '../utils/projectData';
 import ContactForm from '../components/ContactForm';
 
 export default function CategoryPage() {
   const { id } = useParams();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(getProjects());
+  const [categories, setCategories] = useState(getCategories());
   const [activeUploadProject, setActiveUploadProject] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const categoryObj = MAIN_CATEGORIES.find(c => c.id === id) || {};
+  const categoryObj = categories.find(c => c.id === id) || {};
   const categoryTitle = categoryObj.title || '';
   const categoryDesc = categoryObj.desc || '';
 
   useEffect(() => {
+    setCategories(getCategories());
     setProjects(getProjects());
+
+    fetchCategoriesFromSupabase().then(dbCats => {
+      if (dbCats) setCategories(dbCats);
+    });
+    fetchProjectsFromSupabase().then(dbProjs => {
+      if (dbProjs) setProjects(dbProjs);
+    });
+
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
