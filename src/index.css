@@ -744,4 +744,17 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.footer-address-link:hover {
+  color: var(--primary-gold) !important;
+}
+
+.footer-map-btn:hover,
+.contact-map-btn:hover {
+  background-color: var(--primary-gold) !important;
+  color: var(--white) !important;
+  border-color: var(--primary-gold) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+
 

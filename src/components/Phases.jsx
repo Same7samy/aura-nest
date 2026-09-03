@@ -1,23 +1,29 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Paintbrush, Key } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../utils/translations';
 
 export default function Phases() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const isRtl = lang === 'ar';
+
   const phases = [
     {
       icon: <Compass size={28} style={{ color: 'var(--primary-gold)' }} />,
-      title: 'صياغة المفهوم',
-      desc: 'تحليل المساحة ودراسة تطلعات العميل لوضع مخططات هندسية وفراغية متميزة تلائم ذوقه الرفيع.'
+      title: t.phase1Title,
+      desc: t.phase1Desc
     },
     {
       icon: <Paintbrush size={28} style={{ color: 'var(--primary-gold)' }} />,
-      title: 'التنفيذ المتقن',
-      desc: 'تجسيد التصاميم على أرض الواقع عبر أعمال مقاولات وحلول إنشائية دقيقة تلتزم بأعلى معايير الجودة.'
+      title: t.phase2Title,
+      desc: t.phase2Desc
     },
     {
       icon: <Key size={28} style={{ color: 'var(--primary-gold)' }} />,
-      title: 'التسليم الراقي',
-      desc: 'تقديم مساحتك متكاملة الجاهزية وبمستوى تشطيب يفوق التوقعات، وبصمة تليق باسم Aura Nest.'
+      title: t.phase3Title,
+      desc: t.phase3Desc
     }
   ];
 
@@ -28,7 +34,8 @@ export default function Phases() {
         backgroundColor: 'var(--ivory)',
         paddingTop: '3.5rem',
         paddingBottom: '3.5rem',
-        borderBottom: '1px solid rgba(161, 154, 140, 0.15)'
+        borderBottom: '1px solid rgba(161, 154, 140, 0.15)',
+        direction: isRtl ? 'rtl' : 'ltr'
       }}
     >
       <div className="container">
@@ -49,12 +56,13 @@ export default function Phases() {
               className="card glass-panel"
               style={{
                 padding: '2rem 1.75rem',
-                borderRight: '4px solid var(--primary-gold)',
+                borderRight: isRtl ? '4px solid var(--primary-gold)' : 'none',
+                borderLeft: isRtl ? 'none' : '4px solid var(--primary-gold)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
                 backgroundColor: 'var(--white)',
-                textAlign: 'right'
+                textAlign: isRtl ? 'right' : 'left'
               }}
             >
               <div

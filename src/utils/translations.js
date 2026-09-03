@@ -117,7 +117,19 @@ export const translations = {
 
     // Category Page
     categoryTitleTag: 'القطاع الهندسي',
-    categoryNoProjects: 'لم يتم رفع أي مشاريع في هذا القطاع بعد.'
+    categoryNoProjects: 'لم يتم رفع أي مشاريع في هذا القطاع بعد.',
+
+    // Map & Location
+    mapButton: 'عرض على الخريطة (Google Maps)',
+    mapLocationText: 'موقعنا على الخريطة',
+    
+    // Phases
+    phase1Title: 'صياغة المفهوم',
+    phase1Desc: 'تحليل المساحة ودراسة تطلعات العميل لوضع مخططات هندسية وفراغية متميزة تلائم ذوقه الرفيع.',
+    phase2Title: 'التنفيذ المتقن',
+    phase2Desc: 'تجسيد التصاميم على أرض الواقع عبر أعمال مقاولات وحلول إنشائية دقيقة تلتزم بأعلى معايير الجودة.',
+    phase3Title: 'التسليم الراقي',
+    phase3Desc: 'تقديم مساحتك متكاملة الجاهزية وبمستوى تشطيب يفوق التوقعات، وبصمة تليق باسم Aura Nest.'
   },
   en: {
     // Navbar
@@ -237,6 +249,18 @@ export const translations = {
 
     // Category Page
     categoryTitleTag: 'Engineering Sector',
-    categoryNoProjects: 'No projects have been uploaded in this sector yet.'
+    categoryNoProjects: 'No projects have been uploaded in this sector yet.',
+
+    // Map & Location
+    mapButton: 'View on Google Maps',
+    mapLocationText: 'Location on Map',
+
+    // Phases
+    phase1Title: 'Concept Formulation',
+    phase1Desc: 'Analyzing space and client aspirations to create outstanding architectural and spatial layouts matching refined taste.',
+    phase2Title: 'Mastered Execution',
+    phase2Desc: 'Bringing designs to life through precise construction works and structural solutions adhering to top quality standards.',
+    phase3Title: 'Elite Handover',
+    phase3Desc: 'Delivering your fully ready space with finishing exceeding expectations, carrying the signature touch of Aura Nest.'
   }
 };

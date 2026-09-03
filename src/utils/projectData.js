@@ -172,6 +172,7 @@ function safeSetLocalStorage(key, value) {
 export const DEFAULT_CONTACT = {
   address: 'التجمع الخامس — الحي الثاني — ميرنا مول — الدور الثاني',
   addressEn: 'Second District, Myrna Mall, Second Floor, Fifth Settlement, New Cairo',
+  mapUrl: 'https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7',
   phone: '01111 014 008',
   phoneLink: 'tel:01111014008',
   email: 'info@aura-nest.net',

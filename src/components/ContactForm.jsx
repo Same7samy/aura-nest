@@ -90,7 +90,10 @@ Contact Info:
     {
       icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'العنوان' : 'Address',
-      desc: (!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address
+      desc: (!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address,
+      link: contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7",
+      isExternal: true,
+      buttonText: t.mapButton
     },
     {
       icon: <Phone size={24} style={{ color: 'var(--primary-gold)' }} />,
@@ -176,6 +179,8 @@ Contact Info:
                   {info.link ? (
                     <a
                       href={info.link}
+                      target={info.isExternal ? "_blank" : undefined}
+                      rel={info.isExternal ? "noopener noreferrer" : undefined}
                       style={{
                         fontSize: '0.98rem',
                         color: 'var(--text-gray)',
@@ -191,6 +196,33 @@ Contact Info:
                     <p style={{ fontSize: '0.98rem', color: 'var(--text-gray)', fontWeight: 500, margin: 0 }}>
                       {info.desc}
                     </p>
+                  )}
+                  {info.buttonText && (
+                    <a
+                      href={info.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: 'var(--primary-gold)',
+                        backgroundColor: 'var(--light-beige)',
+                        border: '1px solid rgba(212, 175, 55, 0.4)',
+                        padding: '0.3rem 0.75rem',
+                        borderRadius: '4px',
+                        textDecoration: 'none',
+                        marginTop: '0.4rem',
+                        width: 'fit-content',
+                        transition: 'all 0.2s ease'
+                      }}
+                      className="contact-map-btn"
+                    >
+                      <MapPin size={13} />
+                      <span>{info.buttonText}</span>
+                    </a>
                   )}
                 </div>
               </div>
@@ -485,6 +517,64 @@ Contact Info:
           </motion.div>
 
         </div>
+
+        {/* Embedded Interactive Google Map */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
+          viewport={{ once: true, amount: 0.05 }}
+          style={{ marginTop: '3.5rem' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--dark-charcoal)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+              <MapPin size={20} style={{ color: 'var(--primary-gold)' }} />
+              <span>{isRtl ? 'موقعنا التفاعلي على الخريطة' : 'Our Interactive Location Map'}</span>
+            </h3>
+            <a
+              href={contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+              style={{
+                fontSize: '0.82rem',
+                padding: '0.4rem 0.9rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                textDecoration: 'none'
+              }}
+            >
+              <MapPin size={14} />
+              <span>{t.mapButton}</span>
+            </a>
+          </div>
+
+          <div
+            style={{
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-md)',
+              border: '1px solid rgba(161, 154, 140, 0.25)',
+              position: 'relative',
+              height: '380px',
+              width: '100%',
+              backgroundColor: 'var(--white)'
+            }}
+            className="map-embed-wrapper"
+          >
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d221051.00105986843!2d31.63434785798197!3d30.039098637800425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583dd017550959%3A0x42cef18df8f6e14!2sAura%20Nest!5e0!3m2!1sar!2seg!4v1788472134199!5m2!1sar!2seg"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              title="Aura Nest Google Map"
+            />
+          </div>
+        </motion.div>
       </div>
 
       <style>{`

@@ -185,9 +185,47 @@ export default function Footer() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                 <MapPin size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
-                <span style={{ fontSize: '0.92rem', color: 'var(--light-beige)', lineHeight: '1.5' }}>
-                  {(!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address}
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <a
+                    href={contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontSize: '0.92rem',
+                      color: 'var(--light-beige)',
+                      lineHeight: '1.5',
+                      textDecoration: 'none',
+                      transition: 'color var(--transition-fast)'
+                    }}
+                    className="footer-address-link"
+                    title={t.mapTooltip || (isRtl ? 'فتح الموقع على خرائط جوجل' : 'Open location in Google Maps')}
+                  >
+                    {(!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address}
+                  </a>
+                  <a
+                    href={contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      color: 'var(--primary-gold)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      padding: '0.35rem 0.75rem',
+                      borderRadius: '4px',
+                      textDecoration: 'none',
+                      width: 'fit-content',
+                      transition: 'all 0.25s ease'
+                    }}
+                    className="footer-map-btn"
+                  >
+                    <MapPin size={13} />
+                    <span>{t.mapButton}</span>
+                  </a>
+                </div>
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Phone size={18} style={{ color: 'var(--primary-gold)', flexShrink: 0 }} />
