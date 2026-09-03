@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /control
+
+Sitemap: https://www.aura-nest.net/sitemap.xml
