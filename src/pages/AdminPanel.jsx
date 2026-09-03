@@ -91,6 +91,43 @@ export default function AdminPanel() {
     }, 3000);
   };
 
+  // Resilient Multi-Provider Translation Engine
+  const performTranslation = async (text) => {
+    if (!text || !text.trim()) return '';
+    const cleanText = text.trim();
+
+    // Provider 1: Google Translate GTX (Fast, Unlimited & CORS-friendly)
+    try {
+      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ar&tl=en&dt=t&q=${encodeURIComponent(cleanText)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data[0] && Array.isArray(data[0])) {
+          const translated = data[0].map(item => item && item[0]).filter(Boolean).join('');
+          if (translated) return translated;
+        }
+      }
+    } catch (e) {
+      console.warn('Google Translate GTX failed, trying MyMemory...', e);
+    }
+
+    // Provider 2: MyMemory API Fallback
+    try {
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText)}&langpair=ar|en`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.responseData && data.responseData.translatedText) {
+          let trans = data.responseData.translatedText;
+          trans = trans.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+          if (trans && !trans.includes('MYMEMORY WARNING')) return trans;
+        }
+      }
+    } catch (e) {
+      console.warn('MyMemory fallback failed...', e);
+    }
+
+    throw new Error('All translation providers failed');
+  };
+
   // Auto-Translation Helper Function
   const handleAutoTranslate = async (fieldName, sourceVal) => {
     if (!sourceVal || !sourceVal.trim()) {
@@ -99,20 +136,19 @@ export default function AdminPanel() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceVal)}&langpair=ar|en`);
-      const data = await res.json();
-      if (data && data.responseData && data.responseData.translatedText) {
-        const translatedText = data.responseData.translatedText;
+      const translatedText = await performTranslation(sourceVal);
+      if (translatedText) {
         setEditingData(prev => ({
           ...prev,
           [fieldName]: translatedText
         }));
+        showAlert('تمت الترجمة التلقائية بنجاح');
       } else {
-        showAlert('فشلت الترجمة التلقائية، يرجى المحاولة مجدداً أو تعبئته يدوياً', 'error');
+        showAlert('فشلت الترجمة التلقائية، يرجى تعبئتها يدوياً', 'error');
       }
     } catch (e) {
       console.error('Translation error:', e);
-      showAlert('حدث خطأ أثناء الاتصال بخدمة الترجمة', 'error');
+      showAlert('حدث خطأ أثناء الترجمة، يمكنك كتابتها يدوياً', 'error');
     }
     setLoading(false);
   };
@@ -788,16 +824,16 @@ export default function AdminPanel() {
                           }
                           setLoading(true);
                           try {
-                            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(arAddr)}&langpair=ar|en`);
-                            const data = await res.json();
-                            if (data && data.responseData && data.responseData.translatedText) {
-                              const trans = data.responseData.translatedText;
-                              document.getElementById('contact_address_en').value = trans;
+                            const trans = await performTranslation(arAddr);
+                            if (trans) {
+                              const elem = document.getElementById('contact_address_en');
+                              if (elem) elem.value = trans;
+                              showAlert('تمت ترجمة العنوان بنجاح');
                             } else {
                               showAlert('فشلت الترجمة التلقائية، يرجى تعبئته يدوياً', 'error');
                             }
                           } catch (e) {
-                            showAlert('حدث خطأ أثناء الترجمة', 'error');
+                            showAlert('حدث خطأ أثناء الترجمة، يمكنك كتابته يدوياً', 'error');
                           }
                           setLoading(false);
                         }}
@@ -904,16 +940,16 @@ export default function AdminPanel() {
                           }
                           setLoading(true);
                           try {
-                            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(arHours)}&langpair=ar|en`);
-                            const data = await res.json();
-                            if (data && data.responseData && data.responseData.translatedText) {
-                              const trans = data.responseData.translatedText;
-                              document.getElementById('contact_hours_en').value = trans;
+                            const trans = await performTranslation(arHours);
+                            if (trans) {
+                              const elem = document.getElementById('contact_hours_en');
+                              if (elem) elem.value = trans;
+                              showAlert('تمت ترجمة مواعيد العمل بنجاح');
                             } else {
                               showAlert('فشلت الترجمة التلقائية، يرجى تعبئتها يدوياً', 'error');
                             }
                           } catch (e) {
-                            showAlert('حدث خطأ أثناء الترجمة', 'error');
+                            showAlert('حدث خطأ أثناء الترجمة، يمكنك كتابتها يدوياً', 'error');
                           }
                           setLoading(false);
                         }}
