@@ -90,7 +90,9 @@ Contact Info:
     {
       icon: <MapPin size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'العنوان' : 'Address',
-      desc: (!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address,
+      desc: (!isRtl && contactData.addressEn && contactData.addressEn.trim()) 
+        ? contactData.addressEn 
+        : (!isRtl ? 'Second District, Myrna Mall, Second Floor, Fifth Settlement, New Cairo' : contactData.address),
       link: contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7",
       isExternal: true,
       buttonText: t.mapButton
@@ -98,24 +100,27 @@ Contact Info:
     {
       icon: <Phone size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'الهاتف / واتساب' : 'Phone / WhatsApp',
-      desc: contactData.phone,
-      link: contactData.phoneLink
+      desc: contactData.phone || '01111 014 008',
+      link: contactData.phoneLink || 'tel:01111014008',
+      isPhone: true
     },
     {
       icon: <Mail size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'البريد الإلكتروني' : 'Email Address',
-      desc: contactData.email,
-      link: contactData.emailLink
+      desc: contactData.email || 'info@aura-nest.net',
+      link: contactData.emailLink || 'mailto:info@aura-nest.net'
     },
     {
       icon: <Clock size={24} style={{ color: 'var(--primary-gold)' }} />,
       title: isRtl ? 'ساعات العمل' : 'Working Hours',
-      desc: (!isRtl && contactData.hoursEn) ? contactData.hoursEn : contactData.hours
+      desc: (!isRtl && contactData.hoursEn && contactData.hoursEn.trim()) 
+        ? contactData.hoursEn 
+        : (!isRtl ? '10 AM — 8 PM (Daily except Friday)' : contactData.hours)
     }
   ];
 
   return (
-    <section id="contact" className="section-padding" style={{ backgroundColor: 'var(--ivory)' }}>
+    <section id="contact" className="section-padding" style={{ backgroundColor: 'var(--ivory)', direction: isRtl ? 'rtl' : 'ltr' }}>
       <div className="container">
         
         {/* Section Title */}
@@ -152,6 +157,7 @@ Contact Info:
                   alignItems: 'center',
                   gap: '1.5rem',
                   padding: '1.75rem 1.5rem',
+                  direction: isRtl ? 'rtl' : 'ltr',
                   textAlign: isRtl ? 'right' : 'left',
                   flexDirection: isRtl ? 'row' : 'row'
                 }}
@@ -172,8 +178,8 @@ Contact Info:
                   {info.icon}
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', textAlign: isRtl ? 'right' : 'left' }}>
-                  <h4 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 700 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', textAlign: isRtl ? 'right' : 'left', alignItems: isRtl ? 'flex-start' : 'flex-start', flexGrow: 1 }}>
+                  <h4 style={{ fontSize: '1.1rem', color: 'var(--dark-charcoal)', fontWeight: 700, margin: 0 }}>
                     {info.title}
                   </h4>
                   {info.link ? (
@@ -186,14 +192,23 @@ Contact Info:
                         color: 'var(--text-gray)',
                         textDecoration: 'none',
                         transition: 'color var(--transition-fast)',
-                        fontWeight: 600
+                        fontWeight: 600,
+                        direction: info.isPhone ? 'ltr' : (isRtl ? 'rtl' : 'ltr'),
+                        unicodeBidi: info.isPhone ? 'isolate' : undefined,
+                        display: 'inline-block'
                       }}
                       className="contact-link"
                     >
                       {info.desc}
                     </a>
                   ) : (
-                    <p style={{ fontSize: '0.98rem', color: 'var(--text-gray)', fontWeight: 500, margin: 0 }}>
+                    <p style={{ 
+                      fontSize: '0.98rem', 
+                      color: 'var(--text-gray)', 
+                      fontWeight: 500, 
+                      margin: 0,
+                      direction: isRtl ? 'rtl' : 'ltr'
+                    }}>
                       {info.desc}
                     </p>
                   )}

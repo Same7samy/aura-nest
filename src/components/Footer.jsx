@@ -200,7 +200,7 @@ export default function Footer() {
                     className="footer-address-link"
                     title={t.mapTooltip || (isRtl ? 'فتح الموقع على خرائط جوجل' : 'Open location in Google Maps')}
                   >
-                    {(!isRtl && contactData.addressEn) ? contactData.addressEn : contactData.address}
+                    {(!isRtl && contactData.addressEn && contactData.addressEn.trim()) ? contactData.addressEn : (!isRtl ? 'Second District, Myrna Mall, Second Floor, Fifth Settlement, New Cairo' : contactData.address)}
                   </a>
                   <a
                     href={contactData.mapUrl || "https://maps.app.goo.gl/w8LWXW5MVBr7z9rs7"}
@@ -237,6 +237,7 @@ export default function Footer() {
                     textDecoration: 'none',
                     fontWeight: 600,
                     direction: 'ltr',
+                    unicodeBidi: 'isolate',
                     transition: 'color var(--transition-fast)'
                   }}
                   className="footer-phone-link"
